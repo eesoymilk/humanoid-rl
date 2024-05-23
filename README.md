@@ -22,8 +22,8 @@ conda install pytorch -c pytorch        # install pytorch as per your operating 
 
 #### Gymnasium with MuJoCo
 
-We will use the `v5` environment of the MuJoCo Humanoid environment and the pre-release gymnasium (v1.0.0a2) is required to use the latest version of the MuJoCo (v3.1.5).
-Therefore, we need to use the `--pre` flag to install `gymnasium v1.0.0a2`.
+We will use the `v5` environment of the MuJoCo Humanoid environment and the pre-release gymnasium (`v1.0.0a2`) is required to use the latest version of the MuJoCo (`v3.1.5`).
+Therefore, we need to use the `--pre` when installing gymnasium.
 You can see more about the incompatibility issue in [this PR](https://github.com/Farama-Foundation/Gymnasium/pull/746).
 
 ```bash
