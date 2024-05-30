@@ -29,3 +29,9 @@ You can see more about the incompatibility issue in [this PR](https://github.com
 ```bash
 pip install --pre "gymnasium[mujoco]"   # install pre-release gymnasium with mujoco
 ```
+
+#### Stable Baselines3
+
+```bash
+pip install stable-baselines3
+```
