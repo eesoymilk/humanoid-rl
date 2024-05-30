@@ -51,8 +51,8 @@ def main() -> None:
     models_dir = SCRIPT_DIR / "models"
     models_dir.mkdir(parents=True, exist_ok=True)
 
-    model = load_sac_model(env, chkpt=models_dir / "sac_humanoid_05302228")
-    train(model, 2_000_000, models_dir)
+    model = load_sac_model(env, chkpt=models_dir / "sac_humanoid_05302308")
+    train(model, 10_000_000, models_dir)
 
 
 if __name__ == "__main__":
