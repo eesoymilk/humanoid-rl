@@ -14,24 +14,7 @@ conda activate humanoid
 
 ### Install Dependencies
 
-#### PyTorch
-
 ```bash
 conda install pytorch -c pytorch        # install pytorch as per your operating system
-```
-
-#### Gymnasium with MuJoCo
-
-We will use the `v5` environment of the MuJoCo Humanoid environment and the pre-release gymnasium (`v1.0.0a2`) is required to use the latest version of the MuJoCo (`v3.1.5`).
-Therefore, we need to use the `--pre` when installing gymnasium.
-You can see more about the incompatibility issue in [this PR](https://github.com/Farama-Foundation/Gymnasium/pull/746).
-
-```bash
-pip install --pre "gymnasium[mujoco]"   # install pre-release gymnasium with mujoco
-```
-
-#### Stable Baselines3
-
-```bash
-pip install stable-baselines3
+pip install "gymnasium[mujoco]" stable-baselines3
 ```
