@@ -1,42 +1,60 @@
-import numpy as np
+import sys
+import argparse
 import gymnasium as gym
 from pathlib import Path
 from stable_baselines3 import SAC
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.append(str(SCRIPT_DIR))
+
+from utils import get_humanoid_env, get_logger, load_model, eval
 
 
-def eval(
-    env: gym.Env,
-    model: SAC,
-    n_episodes: int = 10,
-    verbose: bool = True,
-) -> None:
-    episode_rewards = []
-    for ep in range(n_episodes):
-        episode_reward = 0
-        obs, _ = env.reset()
-        while True:
-            action, _ = model.predict(obs, deterministic=True)
-            obs, reward, terminated, truncated, _ = env.step(action)
+def parse_args() -> tuple[str, bool]:
+    """
+    Parse the command line arguments.
 
-            episode_reward += reward
+    return:
+        model_name: str
+    """
+    parser = argparse.ArgumentParser(
+        "eval", description="Evaluate the Humanoid environment."
+    )
+    parser.add_argument(
+        "-m",
+        "--model",
+        "--model-name",
+        dest="model_name",
+        type=str,
+        required=True,
+        help="The name of the model to evaluate.",
+    )
+    parser.add_argument(
+        "-r",
+        "--render",
+        action="store_true",
+        type=bool,
+        required=False,
+        help="Render the environment. [Default: False]",
+    )
+    args = parser.parse_args()
 
-            if terminated or truncated:
-                break
-
-        if verbose:
-            print(f"Episode {ep + 1} reward: {episode_reward}")
-
-        episode_rewards.append(episode_reward)
-
-    print(f"Mean episode reward: {np.mean(episode_rewards)}")
+    return (args.model_name, args.render)
 
 
 def main() -> None:
-    # env = gym.make("Humanoid-v4", render_mode="human")
-    env = gym.make("Humanoid-v4")
-    model: SAC = SAC.load(SCRIPT_DIR / "models" / "sac_humanoid_1M")
+    model_name, render = parse_args()
+    parts = model_name.split("_")
+    algo_name = parts[0]
+    use_wrapper = "wrapped" in model_name.split("_")
+
+    env = get_humanoid_env(no_wrapper=not use_wrapper, render_mode=render)
+    model = load_model(
+        env,
+        algo_name,
+        learning=False,
+        chkpt=str(SCRIPT_DIR / "models" / model_name),
+    )
     eval(env, model)
 
 

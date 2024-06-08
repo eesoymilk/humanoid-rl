@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 import gymnasium as gym
 
 from pathlib import Path
@@ -12,8 +13,12 @@ sys.path.append(str(Path(__file__).resolve().parent))
 from humanoid.wrapper import HumanoidCustomObservation
 
 
-def get_humanoid_env(no_wrapper: bool = False, version: int = 4) -> gym.Env:
-    env = gym.make(f"Humanoid-v{version}")
+def get_humanoid_env(
+    no_wrapper: bool = False,
+    version: int = 4,
+    render_mode: Optional[str] = None,
+) -> gym.Env:
+    env = gym.make(f"Humanoid-v{version}", render_mode=render_mode)
     if not no_wrapper:
         env = HumanoidCustomObservation(env)
     return env
@@ -29,18 +34,22 @@ def get_logger(logger_dir: Path | str) -> Logger:
 
 def load_model(
     env: gym.Env,
-    logger: Logger,
     algo: Literal["sac", "td3", "ppo"],
-    lr: float,
+    lr: float = 0.00025,
+    logger: Optional[Logger] = None,
+    learning: bool = True,
     target_update_interval: int = 4,
-    chkpt: Optional[Path] = None,
+    chkpt: Optional[str] = None,
 ) -> SAC | PPO | TD3:
-    args = ("MlpPolicy", env)
+    args = ["MlpPolicy"]
     kwargs = {
         "learning_rate": lr,
         "target_update_interval": target_update_interval,
         "verbose": 1,
     }
+
+    if learning:
+        args.append(env)
 
     print("Algorithm: ", end="")
     if algo == "sac":
@@ -56,7 +65,8 @@ def load_model(
         print("Error")
         raise ValueError(f"Invalid algorithm: {algo}")
 
-    model.set_logger(logger)
+    if logger:
+        model.set_logger(logger)
 
     if chkpt is not None:
         try:
@@ -85,3 +95,30 @@ def train(
     algo_name = model.__class__.__name__.lower()
     fname = f"{algo_name}_{'' if no_wrapper else 'wrapped_'}humanoid"
     model.save(save_dir / fname)
+
+
+def eval(
+    env: gym.Env,
+    model: SAC,
+    n_episodes: int = 10,
+    verbose: bool = True,
+) -> None:
+    episode_rewards = []
+    for ep in range(n_episodes):
+        episode_reward = 0
+        obs, _ = env.reset()
+        while True:
+            action, _ = model.predict(obs, deterministic=True)
+            obs, reward, terminated, truncated, _ = env.step(action)
+
+            episode_reward += reward
+
+            if terminated or truncated:
+                break
+
+        if verbose:
+            print(f"Episode {ep + 1} reward: {episode_reward}")
+
+        episode_rewards.append(episode_reward)
+
+    print(f"Mean episode reward: {np.mean(episode_rewards)}")

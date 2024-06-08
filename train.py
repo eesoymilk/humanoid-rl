@@ -76,7 +76,7 @@ def main() -> None:
     env = get_humanoid_env(no_wrapper)
     logger = get_logger(logger_dir)
 
-    model = load_model(env, logger, algo, lr)
+    model = load_model(env, algo, lr, logger=logger)
     train(model, total_timesteps, checkpoints_dir, no_wrapper)
 
 
