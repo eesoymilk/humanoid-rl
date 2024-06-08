@@ -14,9 +14,9 @@ def get_humanoid_env() -> gym.Env:
     return env
 
 
-def get_logger(logger_dir: Path) -> Logger:
+def get_logger(logger_dir: Path | str) -> Logger:
     logger = configure(
-        folder=logger_dir,
+        folder=str(logger_dir),
         format_strings=["stdout", "log", "csv", "tensorboard"],
     )
     return logger
