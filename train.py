@@ -1,33 +1,59 @@
 import sys
+import argparse
 from pathlib import Path
+from datetime import datetime
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.append(str(SCRIPT_DIR))
 
-from datetime import datetime
-from stable_baselines3 import SAC
-
-from utils import get_humanoid_env, get_logger, load_sac_model
-
-TOTAL_TIMESTEPS = 1_000_000
+from utils import get_humanoid_env, get_logger, load_model, train
 
 
-def train(model: SAC, total_timesteps: int, save_dir: Path) -> None:
-    interrupted = False
-    try:
-        model.learn(total_timesteps=total_timesteps, log_interval=10)
-    except KeyboardInterrupt:
-        interrupted = True
-
-    now = datetime.now()
-    if interrupted:
-        print("Training interrupted at", now.strftime("%m/%d %H:%M:%S"))
-
-    fname = f"sac_humanoid_{now.strftime('%m%d%H%M')}"
-    model.save(save_dir / fname)
+def parse_args():
+    parser = argparse.ArgumentParser(
+        "train", description="Train the Humanoid environment."
+    )
+    parser.add_argument(
+        "-t",
+        "--timesteps",
+        type=int,
+        default=1_000_000,
+        help="The total number of timesteps to train for. [Default: 1_000_000]",
+    )
+    parser.add_argument(
+        "-a",
+        "--algo",
+        type=str,
+        default="sac",
+        choices=["sac", "ppo", "td3"],
+        help="The algorithm to use for training. [Default: sac]",
+    )
+    parser.add_argument(
+        "-her",
+        "--use-her",
+        action="store_true",
+        default=False,
+        help="Use hindsight experience replay. [Default: False]",
+    )
+    parser.add_argument(
+        "-l",
+        "--lr",
+        "--learning-rate",
+        type=float,
+        default=0.00025,
+        help="The learning rate. [Default: 0.00025]",
+    )
+    args = parser.parse_args()
+    return args
 
 
 def main() -> None:
+    args = parse_args()
+    total_timesteps: int = args.timesteps
+    algo: str = args.algo
+    use_her: bool = args.use_her
+    lr: float = args.lr
+
     start_time = datetime.now().strftime("%m%d%H%M")
 
     checkpoints_dir = SCRIPT_DIR / "models" / "checkpoints" / start_time
@@ -39,8 +65,8 @@ def main() -> None:
     env = get_humanoid_env()
     logger = get_logger(logger_dir)
 
-    model = load_sac_model(env, logger)
-    train(model, TOTAL_TIMESTEPS, checkpoints_dir)
+    model = load_model(env, logger, algo, use_her, lr)
+    train(model, total_timesteps, checkpoints_dir)
 
 
 if __name__ == "__main__":
