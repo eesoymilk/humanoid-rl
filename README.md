@@ -21,7 +21,7 @@ pip3 install "gymnasium[mujoco]" stable-baselines3 numpy==2.0.0rc2 tensorboard
 
 ### Fix MuJuCo Rendering Bug
 
-In `/home/<username>/miniconda3/envs/humanoid/lib/python3.11/site-packages/gymnasium/envs/mujoco/mujoco_rendering.py`, there is an bug relating to the rendering of the MuJuCo environment.
+In `$CONDA_PATH/envs/humanoid/lib/python3.11/site-packages/gymnasium/envs/mujoco/mujoco_rendering.py`, there is an bug relating to the rendering of the MuJuCo environment.
 To fix this bug, you need to replace the following code in line 592:
 
 - Before:
