@@ -10,6 +10,7 @@ from datetime import datetime
 from stable_baselines3 import SAC
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+OBS_TYPE = npt.NDArray[np.float64]
 
 
 class HumanoidCustomObservation(ObservationWrapper):
@@ -32,13 +33,32 @@ class HumanoidCustomObservation(ObservationWrapper):
             dtype=np.float64,
         )
 
-    def observation(self, observation: npt.NDArray[np.float64]):
-        # Custom observation logic here
+    def _extract_observation(
+        self, observation: OBS_TYPE
+    ) -> tuple[OBS_TYPE, OBS_TYPE, OBS_TYPE, OBS_TYPE, OBS_TYPE]:
         positional_and_velocity_based_values = observation[: self.cinert_start]
         cinert = observation[self.cinert_start : self.cvel_start]
         cvel = observation[self.cvel_start : self.qfrc_act_start]
         qfrc_actuator = observation[self.qfrc_act_start : self.cfrc_ext_start]
         cfrc_ext = observation[self.cfrc_ext_start : 376]
+
+        return (
+            positional_and_velocity_based_values,
+            cinert,
+            cvel,
+            qfrc_actuator,
+            cfrc_ext,
+        )
+
+    def observation(self, observation: OBS_TYPE):
+        # Custom observation logic here
+        (
+            positional_and_velocity_based_values,
+            cinert,
+            cvel,
+            qfrc_actuator,
+            cfrc_ext,
+        ) = self._extract_observation(observation)
 
         return positional_and_velocity_based_values
 
