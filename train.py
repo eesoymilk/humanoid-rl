@@ -1,10 +1,25 @@
 import gymnasium as gym
+from gymnasium import ObservationWrapper
 from typing import Optional
 from pathlib import Path
 from datetime import datetime
 from stable_baselines3 import SAC
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+
+
+class HumanoidCustomObservation(ObservationWrapper):
+    """Custom observation wrapper for the Humanoid environment."""
+
+    def observation(self, observation):
+        # Custom observation logic here
+        return super().observation(observation)
+
+
+def get_humanoid_env() -> gym.Env:
+    env = gym.make("Humanoid-v4")
+    env = HumanoidCustomObservation(env)
+    return env
 
 
 def load_sac_model(
@@ -47,7 +62,7 @@ def train(model: SAC, total_timesteps: int, save_dir: Path) -> None:
 
 
 def main() -> None:
-    env = gym.make("Humanoid-v4")
+    env = get_humanoid_env()
     models_dir = SCRIPT_DIR / "models"
     models_dir.mkdir(parents=True, exist_ok=True)
 
