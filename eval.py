@@ -38,7 +38,7 @@ def parse_args() -> tuple[str, bool]:
     )
     args = parser.parse_args()
 
-    return (args.model_name, args.render)
+    return args.model_name, args.render
 
 
 def main() -> None:
@@ -46,6 +46,10 @@ def main() -> None:
     parts = model_name.split("_")
     algo_name = parts[0]
     use_wrapper = "wrapped" in model_name.split("_")
+
+    print(
+        f"Evaluation: {algo_name.upper()} {'(use wrapper)' if use_wrapper else ''}"
+    )
 
     env = get_humanoid_env(no_wrapper=not use_wrapper, render_mode=render)
     model = load_model(
