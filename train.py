@@ -15,7 +15,7 @@ def parse_args() -> tuple[int, bool, str, float]:
 
     return:
         total_timesteps: int
-        use_wrapper: bool
+        no_wrapper: bool
         algo: str
         lr: float
     """
@@ -39,9 +39,9 @@ def parse_args() -> tuple[int, bool, str, float]:
     )
     parser.add_argument(
         "--no-wrapper",
-        action="store_false",
-        dest="use_wrapper",
-        default=True,
+        action="store_true",
+        dest="no_wrapper",
+        default=False,
         help="Disable the custom observation wrapper.",
     )
     parser.add_argument(
@@ -56,14 +56,14 @@ def parse_args() -> tuple[int, bool, str, float]:
 
     return (
         args.timesteps,
-        args.use_wrapper,
+        args.no_wrapper,
         args.algo,
         args.lr,
     )
 
 
 def main() -> None:
-    total_timesteps, use_wrapper, algo, lr = parse_args()
+    total_timesteps, no_wrapper, algo, lr = parse_args()
 
     start_time = datetime.now().strftime("%m%d%H%M")
 
@@ -73,11 +73,11 @@ def main() -> None:
     logger_dir = SCRIPT_DIR / "logs" / start_time
     logger_dir.mkdir(parents=True, exist_ok=True)
 
-    env = get_humanoid_env(use_wrapper)
+    env = get_humanoid_env(no_wrapper)
     logger = get_logger(logger_dir)
 
     model = load_model(env, logger, algo, lr)
-    train(model, total_timesteps, checkpoints_dir, use_wrapper)
+    train(model, total_timesteps, checkpoints_dir, no_wrapper)
 
 
 if __name__ == "__main__":

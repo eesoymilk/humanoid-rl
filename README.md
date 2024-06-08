@@ -57,6 +57,10 @@ python3 train.py <options...>
                     
     The total number of timesteps to train for. (Default: `1_000_000`)
 
+- `--no-wrapper`
+
+    Disable the wrapper for the environment. (Default: `False`)
+
 - `-a`, `--algo`: `["sac","ppo","td3"]`
 
     The algorithm to use for training. (Default: `sac`)
