@@ -30,7 +30,7 @@ def train(model: SAC, total_timesteps: int, save_dir: Path) -> None:
 def main() -> None:
     start_time = datetime.now().strftime("%m%d%H%M")
 
-    checkpoints_dir = SCRIPT_DIR / "models" / "checkpoints"
+    checkpoints_dir = SCRIPT_DIR / "models" / "checkpoints" / start_time
     checkpoints_dir.mkdir(parents=True, exist_ok=True)
 
     logger_dir = SCRIPT_DIR / "logs" / start_time
