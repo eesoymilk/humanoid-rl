@@ -12,9 +12,10 @@ sys.path.append(str(Path(__file__).resolve().parent))
 from humanoid.wrapper import HumanoidCustomObservation
 
 
-def get_humanoid_env(version: int = 4) -> gym.Env:
+def get_humanoid_env(use_wrapper: bool = True, version: int = 4) -> gym.Env:
     env = gym.make(f"Humanoid-v{version}")
-    env = HumanoidCustomObservation(env)
+    if use_wrapper:
+        env = HumanoidCustomObservation(env)
     return env
 
 
@@ -68,7 +69,12 @@ def load_model(
     return model
 
 
-def train(model: SAC | PPO | TD3, total_timesteps: int, save_dir: Path) -> None:
+def train(
+    model: SAC | PPO | TD3,
+    total_timesteps: int,
+    save_dir: Path,
+    use_wrapper: bool,
+) -> None:
     interrupted = False
     try:
         model.learn(total_timesteps=total_timesteps, log_interval=10)
@@ -79,5 +85,6 @@ def train(model: SAC | PPO | TD3, total_timesteps: int, save_dir: Path) -> None:
         now = datetime.now()
         print("Training interrupted at", now.strftime("%m/%d %H:%M:%S"))
 
-    fname = f"{model.__class__.__name__.lower()}_humanoid"
+    algo_name = model.__class__.__name__.lower()
+    fname = f"{algo_name}_{'wrapped_' if use_wrapper else ''}humanoid"
     model.save(save_dir / fname)

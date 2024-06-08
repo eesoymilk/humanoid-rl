@@ -9,7 +9,16 @@ sys.path.append(str(SCRIPT_DIR))
 from utils import get_humanoid_env, get_logger, load_model, train
 
 
-def parse_args():
+def parse_args() -> tuple[int, bool, str, float]:
+    """
+    Parse the command line arguments.
+
+    return:
+        total_timesteps: int
+        use_wrapper: bool
+        algo: str
+        lr: float
+    """
     parser = argparse.ArgumentParser(
         "train", description="Train the Humanoid environment."
     )
@@ -29,6 +38,13 @@ def parse_args():
         help="The algorithm to use for training. [Default: sac]",
     )
     parser.add_argument(
+        "--no-wrapper",
+        action="store_false",
+        dest="use_wrapper",
+        default=True,
+        help="Disable the custom observation wrapper.",
+    )
+    parser.add_argument(
         "-l",
         "--lr",
         "--learning-rate",
@@ -37,14 +53,17 @@ def parse_args():
         help="The learning rate. [Default: 0.00025]",
     )
     args = parser.parse_args()
-    return args
+
+    return (
+        args.timesteps,
+        args.use_wrapper,
+        args.algo,
+        args.lr,
+    )
 
 
 def main() -> None:
-    args = parse_args()
-    total_timesteps: int = args.timesteps
-    algo: str = args.algo
-    lr: float = args.lr
+    total_timesteps, use_wrapper, algo, lr = parse_args()
 
     start_time = datetime.now().strftime("%m%d%H%M")
 
@@ -54,11 +73,11 @@ def main() -> None:
     logger_dir = SCRIPT_DIR / "logs" / start_time
     logger_dir.mkdir(parents=True, exist_ok=True)
 
-    env = get_humanoid_env()
+    env = get_humanoid_env(use_wrapper)
     logger = get_logger(logger_dir)
 
     model = load_model(env, logger, algo, lr)
-    train(model, total_timesteps, checkpoints_dir)
+    train(model, total_timesteps, checkpoints_dir, use_wrapper)
 
 
 if __name__ == "__main__":
