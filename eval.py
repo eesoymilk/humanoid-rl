@@ -34,7 +34,8 @@ def eval(
 
 
 def main() -> None:
-    env = gym.make("Humanoid-v4", render_mode="human")
+    # env = gym.make("Humanoid-v4", render_mode="human")
+    env = gym.make("Humanoid-v4")
     model: SAC = SAC.load(SCRIPT_DIR / "models" / "sac_humanoid_1M")
     eval(env, model)
 

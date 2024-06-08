@@ -8,15 +8,15 @@
 ### Create a Conda Environment
 
 ```bash
-conda create -n humanoid python=3.11    # python >=3.8 or <=3.11 is required
+conda create -n humanoid python=3.11 -y    # python >=3.8 or <=3.11 is required
 conda activate humanoid
 ```
 
 ### Install Dependencies
 
 ```bash
-conda install pytorch -c pytorch        # install pytorch as per your operating system
-pip install "gymnasium[mujoco]" stable-baselines3
+conda install pytorch -c pytorch -y        # install pytorch as per your operating system
+pip install "gymnasium[mujoco]" stable-baselines3 numpy==2.0.0rc2
 ```
 
 ### Fix MuJuCo Rendering Bug
