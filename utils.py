@@ -36,20 +36,16 @@ def load_model(
     env: gym.Env,
     algo: Literal["sac", "td3", "ppo"],
     lr: float = 0.00025,
-    logger: Optional[Logger] = None,
-    learning: bool = True,
     target_update_interval: int = 4,
+    logger: Optional[Logger] = None,
     chkpt: Optional[str] = None,
 ) -> SAC | PPO | TD3:
-    args = ["MlpPolicy"]
+    args = ("MlpPolicy", env)
     kwargs = {
         "learning_rate": lr,
         "target_update_interval": target_update_interval,
         "verbose": 1,
     }
-
-    if learning:
-        args.append(env)
 
     print("Algorithm: ", end="")
     if algo == "sac":
@@ -90,7 +86,7 @@ def train(
         model.learn(total_timesteps=total_timesteps, log_interval=log_interval)
     except KeyboardInterrupt:
         now = datetime.now()
-        print("Training interrupted at", now.strftime("%m/%d %H:%M:%S"))
+        print(f"Training interrupted at {now.strftime("%m/%d %H:%M:%S")}")
 
     algo_name = model.__class__.__name__.lower()
     fname = f"{algo_name}_{'' if no_wrapper else 'wrapped_'}humanoid"
@@ -103,22 +99,28 @@ def eval(
     n_episodes: int = 10,
     verbose: bool = True,
 ) -> None:
-    episode_rewards = []
-    for ep in range(n_episodes):
-        episode_reward = 0
-        obs, _ = env.reset()
-        while True:
-            action, _ = model.predict(obs, deterministic=True)
-            obs, reward, terminated, truncated, _ = env.step(action)
+    ep = 0
+    rewards = []
 
-            episode_reward += reward
+    try:
+        while ep < n_episodes:
+            ep_reward = 0
+            obs, _ = env.reset()
+            while True:
+                action, _ = model.predict(obs, deterministic=True)
+                obs, reward, terminated, truncated, _ = env.step(action)
 
-            if terminated or truncated:
-                break
+                ep_reward += reward
 
-        if verbose:
-            print(f"Episode {ep + 1} reward: {episode_reward}")
+                if terminated or truncated:
+                    break
 
-        episode_rewards.append(episode_reward)
+            if verbose:
+                print(f"Episode {ep + 1} reward: {ep_reward}")
 
-    print(f"Mean episode reward: {np.mean(episode_rewards)}")
+            rewards.append(ep_reward)
+
+    except KeyboardInterrupt:
+        print(f"Evaluation interrupted at episode {ep + 1}")
+
+    print(f"Mean episode reward: {np.mean(rewards)}")

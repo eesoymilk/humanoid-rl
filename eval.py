@@ -1,6 +1,7 @@
 import sys
 import argparse
 from pathlib import Path
+from stable_baselines3 import SAC, PPO, TD3
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.append(str(SCRIPT_DIR))
@@ -32,7 +33,6 @@ def parse_args() -> tuple[str, bool]:
         "-r",
         "--render",
         action="store_true",
-        type=bool,
         required=False,
         help="Render the environment. [Default: False]",
     )
@@ -51,13 +51,21 @@ def main() -> None:
         f"Evaluation: {algo_name.upper()} {'(use wrapper)' if use_wrapper else ''}"
     )
 
-    env = get_humanoid_env(no_wrapper=not use_wrapper, render_mode=render)
-    model = load_model(
-        env,
-        algo_name,
-        learning=False,
-        chkpt=str(SCRIPT_DIR / "models" / model_name),
+    env = get_humanoid_env(
+        no_wrapper=not use_wrapper, render_mode="human" if render else None
     )
+
+    chkpt = str(SCRIPT_DIR / "models" / model_name)
+
+    if algo_name == "sac":
+        model = SAC.load(chkpt)
+    elif algo_name == "td3":
+        model = TD3.load(chkpt)
+    elif algo_name == "ppo":
+        model = PPO.load(chkpt)
+    else:
+        raise ValueError(f"Invalid algorithm: {algo_name}")
+
     eval(env, model)
 
 
