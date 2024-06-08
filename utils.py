@@ -12,7 +12,7 @@ sys.path.append(str(Path(__file__).resolve().parent))
 from humanoid.wrapper import HumanoidCustomObservation
 
 
-def get_humanoid_env(no_wrapper: bool = True, version: int = 4) -> gym.Env:
+def get_humanoid_env(no_wrapper: bool = False, version: int = 4) -> gym.Env:
     env = gym.make(f"Humanoid-v{version}")
     if not no_wrapper:
         env = HumanoidCustomObservation(env)
