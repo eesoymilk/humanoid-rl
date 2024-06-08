@@ -30,17 +30,17 @@ def train(model: SAC, total_timesteps: int, save_dir: Path) -> None:
 def main() -> None:
     start_time = datetime.now().strftime("%m%d%H%M")
 
-    models_dir = SCRIPT_DIR / "models"
-    models_dir.mkdir(parents=True, exist_ok=True)
+    checkpoints_dir = SCRIPT_DIR / "models" / "checkpoints"
+    checkpoints_dir.mkdir(parents=True, exist_ok=True)
 
     logger_dir = SCRIPT_DIR / "logs" / start_time
-    models_dir.mkdir(parents=True, exist_ok=True)
+    logger_dir.mkdir(parents=True, exist_ok=True)
 
     env = get_humanoid_env()
     logger = get_logger(logger_dir)
 
     model = load_sac_model(env, logger)
-    train(model, TOTAL_TIMESTEPS, models_dir)
+    train(model, TOTAL_TIMESTEPS, checkpoints_dir)
 
 
 if __name__ == "__main__":
