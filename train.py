@@ -29,7 +29,7 @@ class HumanoidCustomObservation(ObservationWrapper):
         env.observation_space = Box(
             low=-np.inf,
             high=np.inf,
-            shape=(self.cinert_start,),
+            shape=(376 - self.nbody * 15 - self.dof,),
             dtype=np.float64,
         )
 
@@ -50,7 +50,79 @@ class HumanoidCustomObservation(ObservationWrapper):
             cfrc_ext,
         )
 
-    def observation(self, observation: OBS_TYPE):
+    def process_cinert(self, cinert: OBS_TYPE) -> OBS_TYPE:
+        """
+        Process the cinert observation to get the mass, center of mass, and inertia for each body part.
+        This process reduce the size of the observation by nbody * (10 - 3).
+        """
+        masses = cinert[::10]
+        com_x = cinert[1::10]
+        com_y = cinert[2::10]
+        com_z = cinert[3::10]
+        inertia_xx = cinert[4::10]
+        inertia_yy = cinert[5::10]
+        inertia_zz = cinert[6::10]
+        inertia_xy = cinert[7::10]
+        inertia_xz = cinert[8::10]
+        inertia_yz = cinert[9::10]
+
+        processed_cinert = np.zeros((self.nbody, 3))
+        for i in range(self.nbody):
+            com_norm = np.linalg.norm([com_x[i], com_y[i], com_z[i]])
+            inertia_norm = np.linalg.norm(
+                [
+                    inertia_xx[i],
+                    inertia_yy[i],
+                    inertia_zz[i],
+                    inertia_xy[i],
+                    inertia_xz[i],
+                    inertia_yz[i],
+                ]
+            )
+
+            # Combine mass, com_norm, and inertia_norm
+            processed_cinert[i, 0] = masses[i]
+            processed_cinert[i, 1] = com_norm
+            processed_cinert[i, 2] = inertia_norm
+
+        return processed_cinert.flatten()
+
+    def process_cvel(self, vel: OBS_TYPE) -> OBS_TYPE:
+        """
+        Process the vel observation to get the magnitude of the linear and angular velocities for each body part.
+        This process reduce the size of the observation by nbody * (6 - 2).
+        """
+        processed_vel = np.zeros((self.nbody, 2))
+        for i in range(0, self.nbody):
+            linear_vel = vel[i * 6 : i * 6 + 3]
+            angular_vel = vel[i * 6 + 3 : i * 6 + 6]
+            processed_vel[i, 0] = np.linalg.norm(linear_vel)
+            processed_vel[i, 1] = np.linalg.norm(angular_vel)
+        return processed_vel.flatten()
+
+    def process_qfrc_actuator(self, qfrc_actuator: OBS_TYPE) -> OBS_TYPE:
+        """
+        Process the qfrc_actuator observation to get the magnitude of the actuator forces.
+        This process reduce the size of the observation by (dof - 1).
+        """
+        return np.linalg.norm(qfrc_actuator)
+
+    def process_cfrc_ext(self, cfrc_ext: OBS_TYPE) -> OBS_TYPE:
+        """
+        Process the cfrc_ext observation to get the magnitude of the external forces.
+        This process reduce the size of the observation by nbody * (6 - 2).
+        """
+        processed_cfrc_ext = np.zeros((self.nbody, 2))
+
+        for i in range(self.nbody):
+            linear_force = cfrc_ext[i * 6 : i * 6 + 3]
+            torque = cfrc_ext[i * 6 + 3 : i * 6 + 6]
+            processed_cfrc_ext[i, 0] = np.linalg.norm(linear_force)
+            processed_cfrc_ext[i, 1] = np.linalg.norm(torque)
+
+        return processed_cfrc_ext.flatten()
+
+    def observation(self, observation: OBS_TYPE) -> OBS_TYPE:
         # Custom observation logic here
         (
             positional_and_velocity_based_values,
@@ -60,7 +132,20 @@ class HumanoidCustomObservation(ObservationWrapper):
             cfrc_ext,
         ) = self._extract_observation(observation)
 
-        return positional_and_velocity_based_values
+        cinert = self.process_cinert(cinert)
+        cvel = self.process_cvel(cvel)
+        qfrc_actuator = self.process_qfrc_actuator(qfrc_actuator)
+        cfrc_ext = self.process_cfrc_ext(cfrc_ext)
+
+        return np.concatenate(
+            (
+                positional_and_velocity_based_values,
+                cinert,
+                cvel,
+                [qfrc_actuator],
+                cfrc_ext,
+            )
+        )
 
 
 def get_humanoid_env() -> gym.Env:
@@ -106,6 +191,17 @@ def train(model: SAC, total_timesteps: int, save_dir: Path) -> None:
 
     fname = f"sac_humanoid_{now.strftime('%m%d%H%M')}"
     model.save(save_dir / fname)
+
+
+def env_test(env: gym.Env) -> None:
+    env.reset()
+    test_steps = 100
+    for _ in range(test_steps):
+        action = env.action_space.sample()
+        obs, reward, done, _, info = env.step(action)
+        if done:
+            break
+    exit()
 
 
 def main() -> None:
