@@ -14,6 +14,7 @@ def parse_args() -> tuple[str, bool]:
 
     return:
         model_name: str
+        render: bool
     """
     parser = argparse.ArgumentParser(
         "eval", description="Evaluate the Humanoid environment."
