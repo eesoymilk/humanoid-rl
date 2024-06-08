@@ -39,3 +39,31 @@ To fix this bug, you need to replace the following code in line 592:
     ```
 
 After this fix, the rendering of the MuJuCo environment should work properly.
+
+## Usage
+
+```bash
+python train.py <options...>
+```
+
+### Options
+
+- `-h`, `--help`
+
+    Show help message and exit
+
+- `-t`, `--timesteps`: `[int]`
+                    
+    The total number of timesteps to train for. (Default: `1_000_000`)
+
+- `-a`, `--algo`: `["sac","ppo","td3"]`
+
+    The algorithm to use for training. (Default: `sac`)
+
+- `-her`, `--use-her`
+
+    Use hindsight experience replay. (Default: `False`)
+
+- `-l`, `--lr`, `--learning-rate`: `[float]`
+
+    Learning rate. (Default: `0.00025`)
