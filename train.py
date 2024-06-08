@@ -2,11 +2,12 @@ import sys
 import argparse
 from pathlib import Path
 from datetime import datetime
+from stable_baselines3 import SAC, PPO, TD3
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.append(str(SCRIPT_DIR))
 
-from utils import get_humanoid_env, get_logger, load_model, train
+from utils import get_humanoid_env, get_logger, load_model
 
 
 def parse_args() -> tuple[int, bool, str, float]:
@@ -60,6 +61,24 @@ def parse_args() -> tuple[int, bool, str, float]:
         args.algo,
         args.lr,
     )
+
+
+def train(
+    model: SAC | PPO | TD3,
+    total_timesteps: int,
+    save_dir: Path,
+    no_wrapper: bool,
+    log_interval: int = 10,
+) -> None:
+    try:
+        model.learn(total_timesteps=total_timesteps, log_interval=log_interval)
+    except KeyboardInterrupt:
+        now = datetime.now()
+        print(f"Training interrupted at {now.strftime('%m/%d %H:%M:%S')}")
+
+    algo_name = model.__class__.__name__.lower()
+    fname = f"{algo_name}_{'' if no_wrapper else 'wrapped_'}humanoid"
+    model.save(save_dir / fname)
 
 
 def main() -> None:

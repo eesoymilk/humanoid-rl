@@ -1,5 +1,7 @@
 import sys
 import argparse
+import numpy as np
+import gymnasium as gym
 from pathlib import Path
 from stable_baselines3 import SAC, PPO, TD3
 
@@ -30,6 +32,15 @@ def parse_args() -> tuple[str, bool]:
         help="The name of the model to evaluate.",
     )
     parser.add_argument(
+        "--e",
+        "--episodes",
+        "--n-episodes",
+        dest="n_episodes",
+        type=int,
+        default=10,
+        help="The total number of episode to evaluate. [Default: 10]",
+    )
+    parser.add_argument(
         "-r",
         "--render",
         action="store_true",
@@ -38,11 +49,44 @@ def parse_args() -> tuple[str, bool]:
     )
     args = parser.parse_args()
 
-    return args.model_name, args.render
+    return args.model_name, args.episodes, args.render
+
+
+def eval(
+    env: gym.Env,
+    model: SAC | PPO | TD3,
+    n_episodes: int = 10,
+    verbose: bool = True,
+) -> None:
+    ep = 0
+    rewards = []
+
+    try:
+        while ep < n_episodes:
+            ep_reward = 0
+            obs, _ = env.reset()
+            while True:
+                action, _ = model.predict(obs, deterministic=True)
+                obs, reward, terminated, truncated, _ = env.step(action)
+
+                ep_reward += reward
+
+                if terminated or truncated:
+                    break
+
+            if verbose:
+                print(f"Episode {ep + 1} reward: {ep_reward}")
+
+            rewards.append(ep_reward)
+
+    except KeyboardInterrupt:
+        print(f"Evaluation interrupted at episode {ep + 1}")
+
+    print(f"Mean episode reward: {np.mean(rewards)}")
 
 
 def main() -> None:
-    model_name, render = parse_args()
+    model_name, n_episodes, render = parse_args()
     parts = model_name.split("_")
     algo_name = parts[0]
     use_wrapper = "wrapped" in model_name.split("_")
@@ -66,7 +110,7 @@ def main() -> None:
     else:
         raise ValueError(f"Invalid algorithm: {algo_name}")
 
-    eval(env, model)
+    eval(env, model, n_episodes)
 
 
 if __name__ == "__main__":
