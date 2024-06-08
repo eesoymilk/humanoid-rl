@@ -85,11 +85,13 @@ def main() -> None:
     total_timesteps, no_wrapper, algo, lr = parse_args()
 
     start_time = datetime.now().strftime("%m%d%H%M")
+    
+    folder_name = f"{start_time}_{algo}{'' if no_wrapper else '_wrapped'}"
 
-    checkpoints_dir = SCRIPT_DIR / "models" / "checkpoints" / start_time
+    checkpoints_dir = SCRIPT_DIR / "models" / "checkpoints" / folder_name
     checkpoints_dir.mkdir(parents=True, exist_ok=True)
 
-    logger_dir = SCRIPT_DIR / "logs" / start_time
+    logger_dir = SCRIPT_DIR / "logs" / folder_name
     logger_dir.mkdir(parents=True, exist_ok=True)
 
     env = get_humanoid_env(no_wrapper)
