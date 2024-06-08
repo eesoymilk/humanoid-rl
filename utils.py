@@ -86,7 +86,7 @@ def train(
         model.learn(total_timesteps=total_timesteps, log_interval=log_interval)
     except KeyboardInterrupt:
         now = datetime.now()
-        print(f"Training interrupted at {now.strftime("%m/%d %H:%M:%S")}")
+        print(f"Training interrupted at {now.strftime('%m/%d %H:%M:%S')}")
 
     algo_name = model.__class__.__name__.lower()
     fname = f"{algo_name}_{'' if no_wrapper else 'wrapped_'}humanoid"

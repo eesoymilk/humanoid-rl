@@ -42,12 +42,14 @@ After this fix, the rendering of the MuJuCo environment should work properly.
 
 ## Usage
 
+### Training
+
 ```bash
 conda activate humanoid
 python3 train.py <options...>
 ```
 
-### Options
+#### Options
 
 - `-h`, `--help`
 
@@ -68,3 +70,24 @@ python3 train.py <options...>
 - `-l`, `--lr`, `--learning-rate`: `[float]`
 
     Learning rate. (Default: `0.00025`)
+
+### Evaluating
+
+```bash
+conda activate humanoid
+python3 eval.py <options...>
+```
+
+#### Options
+
+- `-h`, `--help`
+
+    Show help message and exit
+
+- (**required**) `-m`, `--model`, `--model-name`: `[str]`
+
+    The name of the model to evaluate.
+
+- `-r`, `--render`
+
+     Render the environment. (Default: `False`)
