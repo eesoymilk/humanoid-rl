@@ -11,12 +11,13 @@ sys.path.append(str(SCRIPT_DIR))
 from utils import get_humanoid_env, eval
 
 
-def parse_args() -> tuple[str, bool]:
+def parse_args() -> tuple[str, int, bool]:
     """
     Parse the command line arguments.
 
     return:
         model_name: str
+        n_episodes: int
         render: bool
     """
     parser = argparse.ArgumentParser(
