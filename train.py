@@ -86,7 +86,7 @@ def main() -> None:
 
     start_time = datetime.now().strftime("%m%d%H%M")
     
-    folder_name = f"{start_time}_{algo}{'' if no_wrapper else '_wrapped'}"
+    folder_name = f"{start_time}_{algo}{'_no-wrapped' if no_wrapper else '_wrapped'}"
 
     checkpoints_dir = SCRIPT_DIR / "models" / "checkpoints" / folder_name
     checkpoints_dir.mkdir(parents=True, exist_ok=True)

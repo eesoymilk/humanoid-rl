@@ -41,9 +41,11 @@ def load_model(
     args = ("MlpPolicy", env)
     kwargs = {
         "learning_rate": lr,
-        "target_update_interval": target_update_interval,
         "verbose": 1,
     }
+    
+    if algo == "sac":
+        kwargs["target_update_interval"] = target_update_interval
 
     print("Algorithm: ", end="")
     if algo == "sac":
