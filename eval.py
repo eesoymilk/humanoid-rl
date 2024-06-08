@@ -1,13 +1,11 @@
 import sys
 import argparse
-import gymnasium as gym
 from pathlib import Path
-from stable_baselines3 import SAC
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.append(str(SCRIPT_DIR))
 
-from utils import get_humanoid_env, get_logger, load_model, eval
+from utils import get_humanoid_env, load_model, eval
 
 
 def parse_args() -> tuple[str, bool]:
