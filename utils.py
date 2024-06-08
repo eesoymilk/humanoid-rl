@@ -3,7 +3,7 @@ import gymnasium as gym
 
 from pathlib import Path
 from typing import Optional, Literal
-from stable_baselines3 import SAC, PPO, TD3
+from stable_baselines3 import SAC, PPO, TD3, A2C, DDPG
 from stable_baselines3.common.logger import configure, Logger
 
 sys.path.append(str(Path(__file__).resolve().parent))
@@ -32,20 +32,15 @@ def get_logger(logger_dir: Path | str) -> Logger:
 
 def load_model(
     env: gym.Env,
-    algo: Literal["sac", "td3", "ppo"],
-    lr: float = 0.00025,
-    target_update_interval: int = 4,
+    algo: Literal["sac", "td3", "ppo", "a2c", "ddpg"],
     logger: Optional[Logger] = None,
     chkpt: Optional[str] = None,
 ) -> SAC | PPO | TD3:
     args = ("MlpPolicy", env)
-    kwargs = {
-        "learning_rate": lr,
-        "verbose": 1,
-    }
+    kwargs = { "verbose": 1 }
     
     if algo == "sac":
-        kwargs["target_update_interval"] = target_update_interval
+        kwargs["target_update_interval"] = 4
 
     print("Algorithm: ", end="")
     if algo == "sac":
@@ -57,6 +52,12 @@ def load_model(
     elif algo == "ppo":
         print("PPO")
         model = PPO(*args, **kwargs)
+    elif algo == "a2c":
+        print("A2C")
+        model = A2C(*args, **kwargs)
+    elif algo == "ddpg":
+        print("DDPG")
+        model = DDPG(*args, **kwargs)
     else:
         print("Error")
         raise ValueError(f"Invalid algorithm: {algo}")

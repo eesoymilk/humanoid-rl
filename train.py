@@ -2,7 +2,7 @@ import sys
 import argparse
 from pathlib import Path
 from datetime import datetime
-from stable_baselines3 import SAC, PPO, TD3
+from stable_baselines3 import SAC, PPO, TD3, A2C, DDPG
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.append(str(SCRIPT_DIR))
@@ -27,7 +27,7 @@ def parse_args() -> tuple[int, bool, str, float]:
         "-t",
         "--timesteps",
         type=int,
-        default=1_000_000,
+        default=10_000_000,
         help="The total number of timesteps to train for. [Default: 1_000_000]",
     )
     parser.add_argument(
@@ -35,7 +35,7 @@ def parse_args() -> tuple[int, bool, str, float]:
         "--algo",
         type=str,
         default="sac",
-        choices=["sac", "ppo", "td3"],
+        choices=["sac", "ppo", "td3", "a2c", "ddpg"],
         help="The algorithm to use for training. [Default: sac]",
     )
     parser.add_argument(
@@ -45,26 +45,17 @@ def parse_args() -> tuple[int, bool, str, float]:
         default=False,
         help="Disable the custom observation wrapper.",
     )
-    parser.add_argument(
-        "-l",
-        "--lr",
-        "--learning-rate",
-        type=float,
-        default=0.00025,
-        help="The learning rate. [Default: 0.00025]",
-    )
     args = parser.parse_args()
 
     return (
         args.timesteps,
         args.no_wrapper,
         args.algo,
-        args.lr,
     )
 
 
 def train(
-    model: SAC | PPO | TD3,
+    model: SAC | PPO | TD3 | A2C | DDPG,
     total_timesteps: int,
     save_dir: Path,
     no_wrapper: bool,
@@ -82,22 +73,22 @@ def train(
 
 
 def main() -> None:
-    total_timesteps, no_wrapper, algo, lr = parse_args()
+    total_timesteps, no_wrapper, algo = parse_args()
 
     start_time = datetime.now().strftime("%m%d%H%M")
     
-    folder_name = f"{start_time}_{algo}{'_no-wrapped' if no_wrapper else '_wrapped'}"
+    folder_name = f"{start_time}_{algo}{'_nowrapped' if no_wrapper else '_wrapped'}"
 
     checkpoints_dir = SCRIPT_DIR / "models" / "checkpoints" / folder_name
     checkpoints_dir.mkdir(parents=True, exist_ok=True)
 
-    logger_dir = SCRIPT_DIR / "logs" / folder_name
+    logger_dir = checkpoints_dir / "logs"
     logger_dir.mkdir(parents=True, exist_ok=True)
 
     env = get_humanoid_env(no_wrapper)
     logger = get_logger(logger_dir)
 
-    model = load_model(env, algo, lr, logger=logger)
+    model = load_model(env, algo, logger=logger)
     train(model, total_timesteps, checkpoints_dir, no_wrapper)
 
 

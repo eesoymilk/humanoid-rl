@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 import gymnasium as gym
 from pathlib import Path
-from stable_baselines3 import SAC, PPO, TD3
+from stable_baselines3 import SAC, PPO, TD3, A2C, DDPG
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.append(str(SCRIPT_DIR))
@@ -109,6 +109,10 @@ def main() -> None:
         model = TD3.load(chkpt)
     elif algo_name == "ppo":
         model = PPO.load(chkpt)
+    elif algo_name == "a2c":
+        model = A2C.load(chkpt)
+    elif algo_name == "ddpg":
+        model = DDPG.load(chkpt)
     else:
         raise ValueError(f"Invalid algorithm: {algo_name}")
 

@@ -19,7 +19,7 @@ class HumanoidCustomObservation(ObservationWrapper):
     qfrc_act_start = cvel_start + nbody * 6
     cfrc_ext_start = qfrc_act_start + dof
 
-    obs_dim = (376 - nbody * 15 - (dof - 1),)
+    obs_dim = (376 + nbody * 6 + 1,)
 
     def __init__(self, env: gym.Env):
         super().__init__(env)
@@ -50,7 +50,7 @@ class HumanoidCustomObservation(ObservationWrapper):
     def _process_cinert(self, cinert: OBS_TYPE) -> OBS_TYPE:
         """
         Process the cinert observation to get the mass, center of mass, and inertia for each body part.
-        This process reduce the size of the observation by nbody * (10 - 3).
+        This process increase the size of the observation by nbody * 2.
         """
         cinert = cinert.reshape(-1, 10)
         masses = cinert[:, 0]
@@ -60,41 +60,41 @@ class HumanoidCustomObservation(ObservationWrapper):
         com_norm = np.linalg.norm(com, axis=1)
         inertia_norm = np.linalg.norm(inertia, axis=1)
 
-        processed_cinert = np.column_stack((masses, com_norm, inertia_norm))
+        processed_cinert = np.column_stack((masses, com, com_norm, inertia, inertia_norm))
 
         return processed_cinert.flatten()
 
     def _process_cvel(self, cvel: OBS_TYPE) -> OBS_TYPE:
         """
         Process the cvel observation to get the magnitude of the linear and angular velocities for each body part.
-        This process reduce the size of the observation by nbody * (6 - 2).
+        This process increase the size of the observation by nbody * 2.
         """
         cvel = cvel.reshape(-1, 6)
         linear_vel = cvel[:, :3]
         angular_vel = cvel[:, 3:]
         linear_vel_norm = np.linalg.norm(linear_vel, axis=1)
         angular_vel_norm = np.linalg.norm(angular_vel, axis=1)
-        processed_cvel = np.column_stack((linear_vel_norm, angular_vel_norm))
+        processed_cvel = np.column_stack((linear_vel, linear_vel_norm, angular_vel, angular_vel_norm))
         return processed_cvel.flatten()
 
     def _process_qfrc_actuator(self, qfrc_actuator: OBS_TYPE) -> OBS_TYPE:
         """
         Process the qfrc_actuator observation to get the magnitude of the actuator forces.
-        This process reduce the size of the observation by (dof - 1).
+        This process increase the size of the observation by 1.
         """
-        return np.array([np.linalg.norm(qfrc_actuator)])
+        return np.concatenate([qfrc_actuator, [np.linalg.norm(qfrc_actuator)]])
 
     def _process_cfrc_ext(self, cfrc_ext: OBS_TYPE) -> OBS_TYPE:
         """
         Process the cfrc_ext observation to get the magnitude of the external forces.
-        This process reduce the size of the observation by nbody * (6 - 2).
+        This process increase the size of the observation by nbody * 2.
         """
         cfrc_ext = cfrc_ext.reshape(-1, 6)
         linear_force = cfrc_ext[:, :3]
         torque = cfrc_ext[:, 3:]
         linear_force_norm = np.linalg.norm(linear_force, axis=1)
         torque_norm = np.linalg.norm(torque, axis=1)
-        processed_cfrc_ext = np.column_stack((linear_force_norm, torque_norm))
+        processed_cfrc_ext = np.column_stack((linear_force, linear_force_norm, torque, torque_norm))
         return processed_cfrc_ext.flatten()
 
     def observation(self, observation: OBS_TYPE) -> OBS_TYPE:

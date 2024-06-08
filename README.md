@@ -21,7 +21,7 @@ pip3 install "gymnasium[mujoco]" stable-baselines3 numpy==2.0.0rc2 tensorboard
 
 ### Fix MuJuCo Rendering Bug
 
-In `$CONDA_PATH/envs/humanoid/lib/python3.11/site-packages/gymnasium/envs/mujoco/mujoco_rendering.py`, there is an bug relating to the rendering of the MuJuCo environment.
+In `$CONDA_PATH/envs/humanoidrun -n libpython3.11/site-packages/gymnasium/envs/mujoco/mujoco_rendering.py`, there is an bug relating to the rendering of the MuJuCo environment.
 To fix this bug, you need to replace the following code in line 592:
 
 - Before:
@@ -45,8 +45,7 @@ After this fix, the rendering of the MuJuCo environment should work properly.
 ### Training
 
 ```bash
-conda activate humanoid
-python3 train.py <options...>
+conda run -n humanoidpython3 train.py <options...>
 ```
 
 #### Options
@@ -74,8 +73,7 @@ python3 train.py <options...>
 ### Evaluating
 
 ```bash
-conda activate humanoid
-python3 eval.py <options...>
+conda run -n humanoidpython3 eval.py <options...>
 ```
 
 #### Options
@@ -91,3 +89,18 @@ python3 eval.py <options...>
 - `-r`, `--render`
 
      Render the environment. (Default: `False`)
+
+## Finished
+
+```bash
+conda run -n humanoid python3 train.py -a sac
+conda run -n humanoid python3 train.py -a sac --no-wrapper
+conda run -n humanoid python3 train.py -a td3
+conda run -n humanoid python3 train.py -a td3 --no-wrapper
+conda run -n humanoid python3 train.py -a ppo
+conda run -n humanoid python3 train.py -a ppo --no-wrapper
+conda run -n humanoid python3 train.py -a a2c
+conda run -n humanoid python3 train.py -a a2c --no-wrapper
+conda run -n humanoid python3 train.py -a ddpg
+conda run -n humanoid python3 train.py -a ddpg --no-wrapper
+```
