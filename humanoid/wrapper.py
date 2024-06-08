@@ -50,6 +50,7 @@ class HumanoidCustomObservation(ObservationWrapper):
         Process the cinert observation to get the mass, center of mass, and inertia for each body part.
         This process reduce the size of the observation by nbody * (10 - 3).
         """
+        processed_cinert = np.zeros((self.nbody, 3))
         masses = cinert[::10]
         com_x, com_y, com_z = cinert[1::10], cinert[2::10], cinert[3::10]
         inertia_xx = cinert[4::10]
@@ -59,7 +60,6 @@ class HumanoidCustomObservation(ObservationWrapper):
         inertia_xz = cinert[8::10]
         inertia_yz = cinert[9::10]
 
-        processed_cinert = np.zeros((self.nbody, 3))
         for i in range(self.nbody):
             com_norm = np.linalg.norm([com_x[i], com_y[i], com_z[i]])
             inertia_norm = np.linalg.norm(
@@ -72,8 +72,6 @@ class HumanoidCustomObservation(ObservationWrapper):
                     inertia_yz[i],
                 ]
             )
-
-            # Combine mass, com_norm, and inertia_norm
             processed_cinert[i, 0] = masses[i]
             processed_cinert[i, 1] = com_norm
             processed_cinert[i, 2] = inertia_norm
@@ -86,11 +84,13 @@ class HumanoidCustomObservation(ObservationWrapper):
         This process reduce the size of the observation by nbody * (6 - 2).
         """
         processed_vel = np.zeros((self.nbody, 2))
+
         for i in range(0, self.nbody):
             linear_vel = vel[i * 6 : i * 6 + 3]
             angular_vel = vel[i * 6 + 3 : i * 6 + 6]
             processed_vel[i, 0] = np.linalg.norm(linear_vel)
             processed_vel[i, 1] = np.linalg.norm(angular_vel)
+
         return processed_vel.flatten()
 
     def _process_qfrc_actuator(self, qfrc_actuator: OBS_TYPE) -> OBS_TYPE:
@@ -116,7 +116,9 @@ class HumanoidCustomObservation(ObservationWrapper):
         return processed_cfrc_ext.flatten()
 
     def observation(self, observation: OBS_TYPE) -> OBS_TYPE:
-        # Custom observation logic here
+        """
+        Process the observation to get the positional and velocity based values, cinert, cvel, qfrc_actuator, and cfrc_ext.
+        """
         (
             positional_and_velocity_based_values,
             cinert,
