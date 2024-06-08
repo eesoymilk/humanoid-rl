@@ -4,7 +4,7 @@ import gymnasium as gym
 from pathlib import Path
 from typing import Optional, Literal
 from datetime import datetime
-from stable_baselines3 import SAC, PPO, TD3, HerReplayBuffer
+from stable_baselines3 import SAC, PPO, TD3
 from stable_baselines3.common.logger import configure, Logger
 
 sys.path.append(str(Path(__file__).resolve().parent))
@@ -30,7 +30,6 @@ def load_model(
     env: gym.Env,
     logger: Logger,
     algo: Literal["sac", "td3", "ppo"],
-    use_her: bool,
     lr: float,
     target_update_interval: int = 4,
     chkpt: Optional[Path] = None,
@@ -41,15 +40,6 @@ def load_model(
         "target_update_interval": target_update_interval,
         "verbose": 1,
     }
-
-    if use_her and algo != "ppo":
-        print("Use Hindsight Experience Replay")
-        kwargs["replay_buffer_class"] = HerReplayBuffer
-        kwargs["replay_buffer_kwargs"] = {
-            "max_episode_length": 1000,
-            "n_sampled_goal": 4,
-            "goal_selection_strategy": "future",
-        }
 
     print("Algorithm: ", end="")
     if algo == "sac":

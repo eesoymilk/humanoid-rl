@@ -29,13 +29,6 @@ def parse_args():
         help="The algorithm to use for training. [Default: sac]",
     )
     parser.add_argument(
-        "-her",
-        "--use-her",
-        action="store_true",
-        default=False,
-        help="Use hindsight experience replay. [Default: False]",
-    )
-    parser.add_argument(
         "-l",
         "--lr",
         "--learning-rate",
@@ -51,7 +44,6 @@ def main() -> None:
     args = parse_args()
     total_timesteps: int = args.timesteps
     algo: str = args.algo
-    use_her: bool = args.use_her
     lr: float = args.lr
 
     start_time = datetime.now().strftime("%m%d%H%M")
@@ -65,7 +57,7 @@ def main() -> None:
     env = get_humanoid_env()
     logger = get_logger(logger_dir)
 
-    model = load_model(env, logger, algo, use_her, lr)
+    model = load_model(env, logger, algo, lr)
     train(model, total_timesteps, checkpoints_dir)
 
 

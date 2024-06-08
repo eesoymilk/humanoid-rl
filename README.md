@@ -61,10 +61,6 @@ python3 train.py <options...>
 
     The algorithm to use for training. (Default: `sac`)
 
-- `-her`, `--use-her`
-
-    Use hindsight experience replay. (Default: `False`)
-
 - `-l`, `--lr`, `--learning-rate`: `[float]`
 
     Learning rate. (Default: `0.00025`)
