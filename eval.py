@@ -8,7 +8,7 @@ from stable_baselines3 import SAC, PPO, TD3
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.append(str(SCRIPT_DIR))
 
-from utils import get_humanoid_env, load_model, eval
+from utils import get_humanoid_env, eval
 
 
 def parse_args() -> tuple[str, bool]:
