@@ -13,7 +13,7 @@ class HumanoidCustomObservation(ObservationWrapper):
 
     def observation(self, observation):
         # Custom observation logic here
-        return super().observation(observation)
+        return observation
 
 
 def get_humanoid_env() -> gym.Env:
