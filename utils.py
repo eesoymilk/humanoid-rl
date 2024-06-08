@@ -29,7 +29,7 @@ def get_logger(logger_dir: Path | str) -> Logger:
 def load_model(
     env: gym.Env,
     logger: Logger,
-    algo: Literal["sac", "ppo", "td3"],
+    algo: Literal["sac", "td3", "ppo"],
     use_her: bool,
     lr: float,
     target_update_interval: int = 4,
@@ -39,19 +39,30 @@ def load_model(
     kwargs = {
         "learning_rate": lr,
         "target_update_interval": target_update_interval,
-        "replay_buffer_class": (
-            HerReplayBuffer if use_her and algo != "ppo" else None
-        ),
         "verbose": 1,
     }
 
+    if use_her and algo != "ppo":
+        print("Use Hindsight Experience Replay")
+        kwargs["replay_buffer_class"] = HerReplayBuffer
+        kwargs["replay_buffer_kwargs"] = {
+            "max_episode_length": 1000,
+            "n_sampled_goal": 4,
+            "goal_selection_strategy": "future",
+        }
+
+    print("Algorithm: ", end="")
     if algo == "sac":
+        print("SAC")
         model = SAC(*args, **kwargs)
-    elif algo == "ppo":
-        model = PPO(*args, **kwargs)
     elif algo == "td3":
+        print("TD3")
         model = TD3(*args, **kwargs)
+    elif algo == "ppo":
+        print("PPO")
+        model = PPO(*args, **kwargs)
     else:
+        print("Error")
         raise ValueError(f"Invalid algorithm: {algo}")
 
     model.set_logger(logger)
@@ -62,6 +73,7 @@ def load_model(
             print(f"Loaded model from {chkpt.name}.")
         except ValueError:
             print(f"Failed to load model from {chkpt.name}.")
+            print("Training from scratch.")
 
     return model
 
