@@ -25,14 +25,14 @@ In `$CONDA_PATH/envs/humanoid/lib/python3.11/site-packages/gymnasium/envs/mujoco
 To fix this bug, you need to replace the following code in line 592:
 
 - Before:
-    ```python=592
+    ```python
             self.add_overlay(
                 bottomleft, "Solver iterations", str(self.data.solver_iter + 1)
             )
     ```
 
 - After:
-    ```python=592
+    ```python
             self.add_overlay(
                 bottomleft, "Solver iterations", str(self.data.solver_niter + 1)
             )
