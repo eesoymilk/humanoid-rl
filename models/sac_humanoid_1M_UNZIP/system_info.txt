@@ -1,8 +1,0 @@
-- OS: Linux-5.15.133.1-microsoft-standard-WSL2-x86_64-with-glibc2.31 # 1 SMP Thu Oct 5 21:02:42 UTC 2023
-- Python: 3.11.9
-- Stable-Baselines3: 2.3.2
-- PyTorch: 2.3.0+cu121
-- GPU Enabled: True
-- Numpy: 2.0.0rc2
-- Cloudpickle: 3.0.0
-- Gymnasium: 0.29.1
