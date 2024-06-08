@@ -1,5 +1,9 @@
+import numpy as np
 import gymnasium as gym
+import numpy.typing as npt
+
 from gymnasium import ObservationWrapper
+from gymnasium.spaces import Box
 from typing import Optional
 from pathlib import Path
 from datetime import datetime
@@ -11,9 +15,32 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 class HumanoidCustomObservation(ObservationWrapper):
     """Custom observation wrapper for the Humanoid environment."""
 
-    def observation(self, observation):
+    nbody = 14
+    dof = 23
+
+    cinert_start = 44
+    cvel_start = cinert_start + nbody * 10
+    qfrc_act_start = cvel_start + nbody * 6
+    cfrc_ext_start = qfrc_act_start + dof
+
+    def __init__(self, env: gym.Env):
+        super().__init__(env)
+        env.observation_space = Box(
+            low=-np.inf,
+            high=np.inf,
+            shape=(self.cinert_start,),
+            dtype=np.float64,
+        )
+
+    def observation(self, observation: npt.NDArray[np.float64]):
         # Custom observation logic here
-        return observation
+        positional_and_velocity_based_values = observation[: self.cinert_start]
+        cinert = observation[self.cinert_start : self.cvel_start]
+        cvel = observation[self.cvel_start : self.qfrc_act_start]
+        qfrc_actuator = observation[self.qfrc_act_start : self.cfrc_ext_start]
+        cfrc_ext = observation[self.cfrc_ext_start : 376]
+
+        return positional_and_velocity_based_values
 
 
 def get_humanoid_env() -> gym.Env:
