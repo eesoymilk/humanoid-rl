@@ -50,7 +50,7 @@ def parse_args() -> tuple[str, int, bool]:
     )
     args = parser.parse_args()
 
-    return args.model_name, args.episodes, args.render
+    return args.model_name, args.n_episodes, args.render
 
 
 def eval(
@@ -78,6 +78,7 @@ def eval(
             if verbose:
                 print(f"Episode {ep + 1} reward: {ep_reward}")
 
+            ep += 1
             rewards.append(ep_reward)
 
     except KeyboardInterrupt:
