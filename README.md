@@ -16,7 +16,7 @@ conda activate humanoid
 
 ```bash
 conda install pytorch -c pytorch -y        # install pytorch as per your operating system
-pip install "gymnasium[mujoco]" stable-baselines3 numpy==2.0.0rc2
+pip install "gymnasium[mujoco]" stable-baselines3 numpy==2.0.0rc2 tensorboard
 ```
 
 ### Fix MuJuCo Rendering Bug
