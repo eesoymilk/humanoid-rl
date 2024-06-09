@@ -1,9 +1,11 @@
 import sys
+import numpy as np
 import gymnasium as gym
 
 from pathlib import Path
 from typing import Optional, Literal
 from stable_baselines3 import SAC, PPO, TD3, A2C, DDPG
+from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.logger import configure, Logger
 
 sys.path.append(str(Path(__file__).resolve().parent))
@@ -37,10 +39,16 @@ def load_model(
     chkpt: Optional[str] = None,
 ) -> SAC | PPO | TD3:
     args = ("MlpPolicy", env)
-    kwargs = { "verbose": 1 }
-    
+    kwargs = {"verbose": 1}
+
     if algo == "sac":
         kwargs["target_update_interval"] = 4
+
+    if algo == "td3":
+        n_actions = env.action_space.shape[-1]
+        kwargs["action_noise"] = NormalActionNoise(
+            mean=np.zeros(n_actions), sigma=0.1 * np.ones(n_actions)
+        )
 
     print("Algorithm: ", end="")
     if algo == "sac":
