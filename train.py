@@ -63,20 +63,19 @@ def train(
     log_interval: int = 10,
     progress_bar: bool = True,
 ) -> None:
-    algo_name = model.__class__.__name__
+    run_name = f"{model.__class__.__name__}_{'no' if no_wrapper else ''}wrapped_{start_time_str}"
     try:
         model.learn(
             total_timesteps=total_timesteps,
             log_interval=log_interval,
-            tb_log_name=f"{algo_name}_{'nowrapped' if no_wrapper else 'wrapped'}_{start_time_str}",
+            tb_log_name=run_name,
             progress_bar=progress_bar,
         )
     except KeyboardInterrupt:
         now = datetime.now()
         print(f"Training interrupted at {now.strftime('%m/%d %H:%M:%S')}")
 
-    fname = f"{algo_name}_{'' if no_wrapper else 'wrapped_'}humanoid"
-    model.save(chkpt_dir / fname)
+    model.save(chkpt_dir / run_name)
 
 
 def main() -> None:
