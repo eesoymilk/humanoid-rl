@@ -10,15 +10,15 @@ sys.path.append(str(SCRIPT_DIR))
 from utils import get_humanoid_env, get_logger, load_model
 
 
-def parse_args() -> tuple[int, bool, str, float]:
+def parse_args() -> tuple[int, int, bool, str]:
     """
     Parse the command line arguments.
 
     return:
         total_timesteps: int
+        n_envs: int
         no_wrapper: bool
         algo: str
-        lr: float
     """
     parser = argparse.ArgumentParser(
         "train", description="Train the Humanoid environment."
@@ -56,6 +56,7 @@ def parse_args() -> tuple[int, bool, str, float]:
 
     return (
         args.timesteps,
+        args.n_envs,
         args.no_wrapper,
         args.algo,
     )
@@ -85,7 +86,7 @@ def train(
 
 
 def main() -> None:
-    total_timesteps, no_wrapper, algo = parse_args()
+    total_timesteps, n_envs, no_wrapper, algo = parse_args()
 
     start_time = datetime.now().strftime("%m%d%H%M")
 
@@ -99,7 +100,7 @@ def main() -> None:
     logger_dir = checkpoints_dir / "logs"
     logger_dir.mkdir(parents=True, exist_ok=True)
 
-    env = get_humanoid_env(no_wrapper)
+    env = get_humanoid_env(no_wrapper, n_envs=n_envs)
     logger = get_logger(logger_dir)
 
     model = load_model(env, algo, logger=logger)

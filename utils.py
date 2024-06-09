@@ -2,8 +2,8 @@ import sys
 import numpy as np
 import gymnasium as gym
 
-from pathlib import Path
 from typing import Optional, Literal
+from pathlib import Path
 from stable_baselines3 import SAC, PPO, TD3, A2C, DDPG
 from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.logger import configure, Logger
@@ -40,7 +40,7 @@ def load_model(
     algo: Literal["sac", "td3", "ppo", "a2c", "ddpg"],
     logger: Optional[Logger] = None,
     chkpt: Optional[str] = None,
-) -> SAC | PPO | TD3:
+) -> SAC | PPO | TD3 | A2C | DDPG:
     args = ("MlpPolicy", env)
     kwargs = {"verbose": 1}
 

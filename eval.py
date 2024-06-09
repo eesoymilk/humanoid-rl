@@ -55,7 +55,7 @@ def parse_args() -> tuple[str, int, bool]:
 
 def eval(
     env: gym.Env,
-    model: SAC | PPO | TD3,
+    model: SAC | PPO | TD3 | A2C | DDPG,
     n_episodes: int = 10,
     verbose: bool = True,
 ) -> None:
