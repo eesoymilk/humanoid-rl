@@ -16,7 +16,7 @@ conda activate humanoid
 
 ```bash
 conda install pytorch -c pytorch -y        # install pytorch as per your operating system
-pip3 install "gymnasium[mujoco]" stable-baselines3 numpy==2.0.0rc2 tensorboard
+pip3 install "gymnasium[mujoco]" "stable-baselines3[extra]" tensorboard numpy
 ```
 
 ### Fix MuJuCo Rendering Bug
@@ -45,7 +45,7 @@ After this fix, the rendering of the MuJuCo environment should work properly.
 ### Training
 
 ```bash
-conda run -n humanoidpython3 train.py <options...>
+conda run -n humanoid python3 train.py <options...>
 ```
 
 #### Options
