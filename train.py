@@ -31,13 +31,6 @@ def parse_args() -> tuple[int, int, bool, str]:
         help="The total number of timesteps to train for. [Default: 1_000_000]",
     )
     parser.add_argument(
-        "-n",
-        "--n_envs",
-        type=int,
-        default=1,
-        help="The number of environments to run in parallel. [Default: 1]",
-    )
-    parser.add_argument(
         "-a",
         "--algo",
         type=str,
@@ -56,7 +49,6 @@ def parse_args() -> tuple[int, int, bool, str]:
 
     return (
         args.timesteps,
-        args.n_envs,
         args.no_wrapper,
         args.algo,
     )
@@ -65,15 +57,17 @@ def parse_args() -> tuple[int, int, bool, str]:
 def train(
     model: SAC | PPO | TD3 | A2C | DDPG,
     total_timesteps: int,
-    save_dir: Path,
+    chkpt_dir: Path,
     no_wrapper: bool,
     log_interval: int = 10,
     progress_bar: bool = True,
 ) -> None:
     try:
+        model_name = model.__class__.__name__
         model.learn(
             total_timesteps=total_timesteps,
             log_interval=log_interval,
+            tb_log_name=f"{model_name}_{'nowrapped' if no_wrapper else 'wrapped'}",
             progress_bar=progress_bar,
         )
     except KeyboardInterrupt:
@@ -82,11 +76,11 @@ def train(
 
     algo_name = model.__class__.__name__.lower()
     fname = f"{algo_name}_{'' if no_wrapper else 'wrapped_'}humanoid"
-    model.save(save_dir / fname)
+    model.save(chkpt_dir / fname)
 
 
 def main() -> None:
-    total_timesteps, n_envs, no_wrapper, algo = parse_args()
+    total_timesteps, no_wrapper, algo = parse_args()
 
     start_time = datetime.now().strftime("%m%d%H%M")
 
@@ -94,17 +88,16 @@ def main() -> None:
         f"{start_time}_{algo}{'_nowrapped' if no_wrapper else '_wrapped'}"
     )
 
-    checkpoints_dir = SCRIPT_DIR / "models" / "checkpoints" / folder_name
-    checkpoints_dir.mkdir(parents=True, exist_ok=True)
+    chkpt_dir = SCRIPT_DIR / "models" / "checkpoints" / folder_name
+    chkpt_dir.mkdir(parents=True, exist_ok=True)
 
-    logger_dir = checkpoints_dir / "logs"
-    logger_dir.mkdir(parents=True, exist_ok=True)
+    tb_log = chkpt_dir / "logs"
+    tb_log.mkdir(parents=True, exist_ok=True)
 
-    env = get_humanoid_env(no_wrapper, n_envs=n_envs)
-    logger = get_logger(logger_dir)
+    env = get_humanoid_env(no_wrapper=no_wrapper)
 
-    model = load_model(env, algo, logger=logger)
-    train(model, total_timesteps, checkpoints_dir, no_wrapper)
+    model = load_model(env, algo, tensorboard_log=tb_log)
+    train(model, total_timesteps, chkpt_dir, no_wrapper)
 
 
 if __name__ == "__main__":

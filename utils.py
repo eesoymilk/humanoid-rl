@@ -18,36 +18,25 @@ def get_humanoid_env(
     no_wrapper: bool = False,
     version: int = 4,
     render_mode: Optional[str] = None,
-    n_envs: int = 1,
 ) -> gym.Env:
     env = gym.make(f"Humanoid-v{version}", render_mode=render_mode)
     if not no_wrapper:
         env = HumanoidCustomObservation(env)
-    env = make_vec_env(env, n_envs=n_envs)
     return env
-
-
-def get_logger(logger_dir: Path | str) -> Logger:
-    logger = configure(
-        folder=str(logger_dir),
-        format_strings=["stdout", "log", "csv", "tensorboard"],
-    )
-    return logger
 
 
 def load_model(
     env: gym.Env,
     algo: Literal["sac", "td3", "ppo", "a2c", "ddpg"],
-    logger: Optional[Logger] = None,
+    tensorboard_log: Optional[str] = None,
     chkpt: Optional[str] = None,
 ) -> SAC | PPO | TD3 | A2C | DDPG:
     args = ("MlpPolicy", env)
-    kwargs = {"verbose": 1}
+    kwargs = {"verbose": 1, "tensorboard_log": tensorboard_log}
 
     print("Algorithm: ", end="")
     if algo == "sac":
         print("SAC")
-        kwargs["target_update_interval"] = 4
         model = SAC(*args, **kwargs)
     elif algo == "td3":
         print("TD3")
@@ -68,15 +57,11 @@ def load_model(
         print("Error")
         raise ValueError(f"Invalid algorithm: {algo}")
 
-    if logger:
-        model.set_logger(logger)
-
     if chkpt is not None:
         try:
             model.set_parameters(chkpt)
-            print(f"Loaded model from {chkpt.name}.")
+            print(f"Loaded model from {chkpt}.")
         except ValueError:
-            print(f"Failed to load model from {chkpt.name}.")
-            print("Training from scratch.")
+            print(f"Failed to load model from {chkpt}.\nTraining from scratch.")
 
     return model

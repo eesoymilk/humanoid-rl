@@ -66,10 +66,6 @@ conda run -n humanoidpython3 train.py <options...>
 
     The algorithm to use for training. (Default: `sac`)
 
-- `-n`, `--n_envs`: `[int]`
-
-    The number of environments to run in parallel. (Default: `1`)
-
 ### Evaluating
 
 ```bash
