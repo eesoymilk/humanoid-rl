@@ -1,13 +1,10 @@
 import sys
 import numpy as np
 import gymnasium as gym
-
 from typing import Optional, Literal
 from pathlib import Path
 from stable_baselines3 import SAC, PPO, TD3, A2C, DDPG
 from stable_baselines3.common.noise import NormalActionNoise
-from stable_baselines3.common.logger import configure, Logger
-from stable_baselines3.common.env_util import make_vec_env
 
 sys.path.append(str(Path(__file__).resolve().parent))
 
