@@ -27,7 +27,7 @@ def parse_args() -> tuple[int, int, bool, str]:
         "-t",
         "--timesteps",
         type=int,
-        default=10_000_000,
+        default=2_000_000,
         help="The total number of timesteps to train for. [Default: 1_000_000]",
     )
     parser.add_argument(
