@@ -49,9 +49,8 @@ def load_model(
 
     if algo == "td3":
         n_actions = env.action_space.shape[-1]
-        kwargs["action_noise"] = NormalActionNoise(
-            mean=np.zeros(n_actions), sigma=0.1 * np.ones(n_actions)
-        )
+        mu, std = np.zeros(n_actions), 0.1 * np.ones(n_actions)
+        kwargs["action_noise"] = NormalActionNoise(mu, std)
 
     print("Algorithm: ", end="")
     if algo == "sac":
