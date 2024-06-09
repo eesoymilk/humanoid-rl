@@ -56,25 +56,25 @@ def parse_args() -> tuple[int, int, bool, str]:
 
 def train(
     model: SAC | PPO | TD3 | A2C | DDPG,
+    start_time: str,
     total_timesteps: int,
     chkpt_dir: Path,
     no_wrapper: bool,
     log_interval: int = 10,
     progress_bar: bool = True,
 ) -> None:
+    algo_name = model.__class__.__name__
     try:
-        model_name = model.__class__.__name__
         model.learn(
             total_timesteps=total_timesteps,
             log_interval=log_interval,
-            tb_log_name=f"{model_name}_{'nowrapped' if no_wrapper else 'wrapped'}",
+            tb_log_name=f"{algo_name}_{'nowrapped' if no_wrapper else 'wrapped'}_{start_time}",
             progress_bar=progress_bar,
         )
     except KeyboardInterrupt:
         now = datetime.now()
         print(f"Training interrupted at {now.strftime('%m/%d %H:%M:%S')}")
 
-    algo_name = model.__class__.__name__.lower()
     fname = f"{algo_name}_{'' if no_wrapper else 'wrapped_'}humanoid"
     model.save(chkpt_dir / fname)
 
@@ -97,7 +97,7 @@ def main() -> None:
     env = get_humanoid_env(no_wrapper=no_wrapper)
 
     model = load_model(env, algo, tensorboard_log=tb_log)
-    train(model, total_timesteps, chkpt_dir, no_wrapper)
+    train(model, start_time, total_timesteps, chkpt_dir, no_wrapper)
 
 
 if __name__ == "__main__":
