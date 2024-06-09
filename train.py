@@ -67,9 +67,14 @@ def train(
     save_dir: Path,
     no_wrapper: bool,
     log_interval: int = 10,
+    progress_bar: bool = True,
 ) -> None:
     try:
-        model.learn(total_timesteps=total_timesteps, log_interval=log_interval)
+        model.learn(
+            total_timesteps=total_timesteps,
+            log_interval=log_interval,
+            progress_bar=progress_bar,
+        )
     except KeyboardInterrupt:
         now = datetime.now()
         print(f"Training interrupted at {now.strftime('%m/%d %H:%M:%S')}")
