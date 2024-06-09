@@ -7,6 +7,7 @@ from typing import Optional, Literal
 from stable_baselines3 import SAC, PPO, TD3, A2C, DDPG
 from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.logger import configure, Logger
+from stable_baselines3.common.env_util import make_vec_env
 
 sys.path.append(str(Path(__file__).resolve().parent))
 
@@ -17,10 +18,12 @@ def get_humanoid_env(
     no_wrapper: bool = False,
     version: int = 4,
     render_mode: Optional[str] = None,
+    n_envs: int = 1,
 ) -> gym.Env:
     env = gym.make(f"Humanoid-v{version}", render_mode=render_mode)
     if not no_wrapper:
         env = HumanoidCustomObservation(env)
+    env = make_vec_env(env, n_envs=n_envs)
     return env
 
 

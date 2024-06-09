@@ -66,14 +66,14 @@ conda run -n humanoidpython3 train.py <options...>
 
     The algorithm to use for training. (Default: `sac`)
 
-- `-l`, `--lr`, `--learning-rate`: `[float]`
+- `-n`, `--n_envs`: `[int]`
 
-    Learning rate. (Default: `0.00025`)
+    The number of environments to run in parallel. (Default: `1`)
 
 ### Evaluating
 
 ```bash
-conda run -n humanoidpython3 eval.py <options...>
+conda run -n humanoid python3 eval.py <options...>
 ```
 
 #### Options

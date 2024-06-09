@@ -31,6 +31,13 @@ def parse_args() -> tuple[int, bool, str, float]:
         help="The total number of timesteps to train for. [Default: 1_000_000]",
     )
     parser.add_argument(
+        "-n",
+        "--n_envs",
+        type=int,
+        default=1,
+        help="The number of environments to run in parallel. [Default: 1]",
+    )
+    parser.add_argument(
         "-a",
         "--algo",
         type=str,
@@ -76,8 +83,10 @@ def main() -> None:
     total_timesteps, no_wrapper, algo = parse_args()
 
     start_time = datetime.now().strftime("%m%d%H%M")
-    
-    folder_name = f"{start_time}_{algo}{'_nowrapped' if no_wrapper else '_wrapped'}"
+
+    folder_name = (
+        f"{start_time}_{algo}{'_nowrapped' if no_wrapper else '_wrapped'}"
+    )
 
     checkpoints_dir = SCRIPT_DIR / "models" / "checkpoints" / folder_name
     checkpoints_dir.mkdir(parents=True, exist_ok=True)
