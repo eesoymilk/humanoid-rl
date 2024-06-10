@@ -62,7 +62,7 @@ conda run -n humanoid python3 train.py <options...>
 
     Disable the wrapper for the environment. (Default: `False`)
 
-- `-a`, `--algo`: `["sac","ppo","td3"]`
+- `-a`, `--algo`: `["sac","ppo","td3", "a2c", "ddpg"]`
 
     The algorithm to use for training. (Default: `sac`)
 
