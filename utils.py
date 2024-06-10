@@ -31,15 +31,17 @@ def load_model(
     args = ("MlpPolicy", env)
     kwargs = {"verbose": 1, "tensorboard_log": tensorboard_log}
 
+    if algo in ["td3", "ddpg"]:
+        n_actions = env.action_space.shape[-1]
+        mu, std = np.zeros(n_actions), 0.1 * np.ones(n_actions)
+        kwargs["action_noise"] = NormalActionNoise(mu, std)
+
     print("Algorithm: ", end="")
     if algo == "sac":
         print("SAC")
         model = SAC(*args, **kwargs)
     elif algo == "td3":
         print("TD3")
-        n_actions = env.action_space.shape[-1]
-        mu, std = np.zeros(n_actions), 0.1 * np.ones(n_actions)
-        kwargs["action_noise"] = NormalActionNoise(mu, std)
         model = TD3(*args, **kwargs)
     elif algo == "ppo":
         print("PPO")
