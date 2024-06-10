@@ -59,8 +59,8 @@ def plot_comparison(base_dir, tags):
 
 def plot_wrapper_nowrapper_comparsion(base_dir, tags):
     for tag in tags:
-        plt.figure(figsize=(15, 10))
         for algo in ALGOS:
+            plt.figure(figsize=(15, 10))
             for wrapped in WRAPPED:
                 directory_path = os.path.join(base_dir, 'FINAL_DATA', 'DATA_CSV', f'{algo}_{wrapped}')
                 for filename in os.listdir(directory_path):
@@ -68,12 +68,12 @@ def plot_wrapper_nowrapper_comparsion(base_dir, tags):
                         file_path = os.path.join(directory_path, filename)
                         data = pd.read_csv(file_path)
                         plt.plot(data['Step'], data['Value'], label=f'{algo} {wrapped}')
-        plt.xlabel('Step')
-        plt.ylabel('Reward')
-        plt.legend()
-        plt.grid(True)
-        plt.savefig(os.path.join(base_dir, 'src', f'comparison_{tag}.png'))
-        plt.close()
+            plt.xlabel('Step')
+            plt.ylabel('Reward')
+            plt.legend()
+            plt.grid(True)
+            plt.savefig(os.path.join(base_dir, 'src', f'comparison_{algo}.png'))
+            plt.close()
 
 if __name__ == '__main__':
     tags = ['ep_len_mean', 'ep_rew_mean']
