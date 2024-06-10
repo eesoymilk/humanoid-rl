@@ -17,7 +17,7 @@ def plot_csv_files(directory_path):
             
             # 繪製圖表
             plt.figure(figsize=(10, 6))
-            plt.plot(data['Step'], data['Value'], label=f'{filename[:-4]}')  # 使用文件名作為圖例標籤
+            plt.plot(data['Step'], data['Value'], label=f'{filename[4:-4]}')  # 使用文件名作為圖例標籤
             
             # 圖表標題和軸標籤
             y_label = ' '.join(filename[filename.index('tag-') + 4:-4].split('_'))
@@ -37,9 +37,9 @@ def go_throght_dir(base_dir):
             plot_csv_files(os.path.join(base_dir, 'FINAL_DATA', 'DATA_CSV', f'{algo}_{wrapped}'))
             
 def plot_comparison(base_dir, tags):
-    plt.figure(figsize=(15, 10))
     
     for wrapped in WRAPPED:
+        plt.figure(figsize=(15, 10))
         for algo in ALGOS:
             directory_path = os.path.join(base_dir, 'FINAL_DATA', 'DATA_CSV', f'{algo}_{wrapped}')
             for filename in os.listdir(directory_path):
@@ -49,7 +49,7 @@ def plot_comparison(base_dir, tags):
                     
                     for tag in tags:
                         if tag in filename:
-                            plt.plot(data['Step'], data['Value'], label=f'{algo}_{wrapped}_{tag}')
+                            plt.plot(data['Step'], data['Value'], label=f'{algo} {wrapped} {tag}')
         plt.xlabel('Step')
         plt.ylabel('Reward')
         plt.legend()
