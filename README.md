@@ -56,7 +56,7 @@ conda run -n humanoid python3 train.py <options...>
 
 - `-t`, `--timesteps`: `[int]`
                     
-    The total number of timesteps to train for. (Default: `2_000_000`)
+    The total number of timesteps to train for. (Default: `5_000_000`)
 
 - `--no-wrapper`
 
