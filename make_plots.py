@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 
 ALGOS = ['SAC', 'PPO', 'TD3', 'DDPG', 'A2C']
-WRAPPED = ['nowrapped', 'wrapped']
+WRAPPED = ['no_wrapped', 'wrapped']
 
 def plot_csv_files(directory_path):
     # 檢查目錄中的所有文件
@@ -34,7 +34,33 @@ def plot_csv_files(directory_path):
 def go_throght_dir(base_dir):
     for algo in ALGOS:
         for wrapped in WRAPPED:
-            plot_csv_files(os.path.join(base_dir, f'{algo}_{wrapped}'))
+            plot_csv_files(os.path.join(base_dir, 'FINAL_DATA', 'DATA_CSV', f'{algo}_{wrapped}'))
             
+def plot_comparison(base_dir, tags):
+    plt.figure(figsize=(15, 10))
+    
+    for algo in ALGOS:
+        for wrapped in WRAPPED:
+            directory_path = os.path.join(base_dir, 'FINAL_DATA', 'DATA_CSV', f'{algo}_{wrapped}')
+            for filename in os.listdir(directory_path):
+                if filename.endswith('.csv') and any(tag in filename for tag in tags):
+                    file_path = os.path.join(directory_path, filename)
+                    data = pd.read_csv(file_path)
+                    
+                    for tag in tags:
+                        if tag in filename:
+                            plt.plot(data['Step'], data['Value'], label=f'{algo}_{wrapped}_{tag}')
+
+    plt.xlabel('Step')
+    plt.ylabel('Reward')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(os.path.join(base_dir, f'comparison_{tags[0]}.png'))
+    plt.close()
+
 if __name__ == '__main__':
-    go_throght_dir('./')
+    tags = ['ep_len_mean', 'ep_rew_mean']
+    plot_comparison(os.getcwd(), [tags[0]])
+    plot_comparison(os.getcwd(), [tags[1]])
+    
+    go_throght_dir(os.getcwd())
