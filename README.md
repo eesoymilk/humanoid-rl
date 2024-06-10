@@ -89,14 +89,14 @@ conda run -n humanoid python3 eval.py <options...>
 ## Finished
 
 ```bash
-conda run -n humanoid python3 train.py -a sac
-conda run -n humanoid python3 train.py -a sac --no-wrapper
-conda run -n humanoid python3 train.py -a td3
-conda run -n humanoid python3 train.py -a td3 --no-wrapper
-conda run -n humanoid python3 train.py -a ppo
-conda run -n humanoid python3 train.py -a ppo --no-wrapper
-conda run -n humanoid python3 train.py -a a2c
-conda run -n humanoid python3 train.py -a a2c --no-wrapper
-conda run -n humanoid python3 train.py -a ddpg
-conda run -n humanoid python3 train.py -a ddpg --no-wrapper
+conda activate humanoid && python3 train.py -a sac
+conda activate humanoid && python3 train.py -a sac --no-wrapper
+conda activate humanoid && python3 train.py -a td3
+conda activate humanoid && python3 train.py -a td3 --no-wrapper
+conda activate humanoid && python3 train.py -a ppo
+conda activate humanoid && python3 train.py -a ppo --no-wrapper
+conda activate humanoid && python3 train.py -a a2c
+conda activate humanoid && python3 train.py -a a2c --no-wrapper
+conda activate humanoid && python3 train.py -a ddpg
+conda activate humanoid && python3 train.py -a ddpg --no-wrapper
 ```
