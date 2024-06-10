@@ -39,8 +39,8 @@ def go_throght_dir(base_dir):
 def plot_comparison(base_dir, tags):
     plt.figure(figsize=(15, 10))
     
-    for algo in ALGOS:
-        for wrapped in WRAPPED:
+    for wrapped in WRAPPED:
+        for algo in ALGOS:
             directory_path = os.path.join(base_dir, 'FINAL_DATA', 'DATA_CSV', f'{algo}_{wrapped}')
             for filename in os.listdir(directory_path):
                 if filename.endswith('.csv') and any(tag in filename for tag in tags):
@@ -50,13 +50,12 @@ def plot_comparison(base_dir, tags):
                     for tag in tags:
                         if tag in filename:
                             plt.plot(data['Step'], data['Value'], label=f'{algo}_{wrapped}_{tag}')
-
-    plt.xlabel('Step')
-    plt.ylabel('Reward')
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(os.path.join(base_dir, f'comparison_{tags[0]}.png'))
-    plt.close()
+        plt.xlabel('Step')
+        plt.ylabel('Reward')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(os.path.join(base_dir, f'comparison_{tags[0]}_{wrapped}.png'))
+        plt.close()
 
 if __name__ == '__main__':
     tags = ['ep_len_mean', 'ep_rew_mean']
