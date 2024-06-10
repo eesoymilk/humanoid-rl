@@ -22,6 +22,7 @@ class HumanoidCustomObservation(ObservationWrapper):
     obs_dim = (376 + nbody * 6 + 1,)
 
     def __init__(self, env: gym.Env):
+        print("Initializing custom observation wrapper.")
         super().__init__(env)
         env.observation_space = Box(
             low=-np.inf,
@@ -60,7 +61,9 @@ class HumanoidCustomObservation(ObservationWrapper):
         com_norm = np.linalg.norm(com, axis=1)
         inertia_norm = np.linalg.norm(inertia, axis=1)
 
-        processed_cinert = np.column_stack((masses, com, com_norm, inertia, inertia_norm))
+        processed_cinert = np.column_stack(
+            (masses, com, com_norm, inertia, inertia_norm)
+        )
 
         return processed_cinert.flatten()
 
@@ -74,7 +77,9 @@ class HumanoidCustomObservation(ObservationWrapper):
         angular_vel = cvel[:, 3:]
         linear_vel_norm = np.linalg.norm(linear_vel, axis=1)
         angular_vel_norm = np.linalg.norm(angular_vel, axis=1)
-        processed_cvel = np.column_stack((linear_vel, linear_vel_norm, angular_vel, angular_vel_norm))
+        processed_cvel = np.column_stack(
+            (linear_vel, linear_vel_norm, angular_vel, angular_vel_norm)
+        )
         return processed_cvel.flatten()
 
     def _process_qfrc_actuator(self, qfrc_actuator: OBS_TYPE) -> OBS_TYPE:
@@ -94,7 +99,9 @@ class HumanoidCustomObservation(ObservationWrapper):
         torque = cfrc_ext[:, 3:]
         linear_force_norm = np.linalg.norm(linear_force, axis=1)
         torque_norm = np.linalg.norm(torque, axis=1)
-        processed_cfrc_ext = np.column_stack((linear_force, linear_force_norm, torque, torque_norm))
+        processed_cfrc_ext = np.column_stack(
+            (linear_force, linear_force_norm, torque, torque_norm)
+        )
         return processed_cfrc_ext.flatten()
 
     def observation(self, observation: OBS_TYPE) -> OBS_TYPE:
