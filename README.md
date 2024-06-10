@@ -15,7 +15,8 @@ conda activate humanoid
 ### Install Dependencies
 
 ```bash
-conda install pytorch -c pytorch -y        # install pytorch as per your operating system
+# install pytorch as per your operating system, the below command applies to Linux
+conda install pytorch pytorch-cuda=12.1 -c pytorch -c nvidia -y
 pip3 install "gymnasium[mujoco]" "stable-baselines3[extra]" tensorboard numpy
 ```
 
