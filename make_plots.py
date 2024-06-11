@@ -75,6 +75,40 @@ def plot_wrapper_nowrapper_comparsion(base_dir, tags):
             plt.savefig(os.path.join(base_dir, 'src', f'comparison_{algo}.png'))
             plt.close()
 
+def plot_sac_compare(base_dir):
+    tags = ['actor_loss', 'critic_loss']
+    for tag in tags:
+        plt.figure(figsize=(15, 10))
+        for wrapped in WRAPPED:
+            directory_path = os.path.join(base_dir, 'FINAL_DATA', 'DATA_CSV', f'SAC_{wrapped}')
+            for filename in os.listdir(directory_path):
+                if filename.endswith('.csv') and tag in filename:
+                    file_path = os.path.join(directory_path, filename)
+                    data = pd.read_csv(file_path)
+                    plt.plot(data['Step'], data['Value'], label=f'SAC {wrapped} {tag}')
+        plt.xlabel('Step')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(os.path.join(base_dir, 'src', f'comparison_SAC_{tag}.png'))
+        plt.close()
+
+def plot_ppo_compare(base_dir):
+    tags = ['train_loss', 'policy_gradient_loss', 'train_value_loss', 'approx_kl']
+    for tag in tags:
+        plt.figure(figsize=(15, 10))
+        for wrapped in WRAPPED:
+            directory_path = os.path.join(base_dir, 'FINAL_DATA', 'DATA_CSV', f'PPO_{wrapped}')
+            for filename in os.listdir(directory_path):
+                if filename.endswith('.csv') and tag in filename:
+                    file_path = os.path.join(directory_path, filename)
+                    data = pd.read_csv(file_path)
+                    plt.plot(data['Step'], data['Value'], label=f'SAC {wrapped} {tag}')
+        plt.xlabel('Step')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(os.path.join(base_dir, 'src', f'comparison_PPO_{tag}.png'))
+        plt.close()
+            
 if __name__ == '__main__':
     tags = ['ep_len_mean', 'ep_rew_mean']
     plot_comparison(os.getcwd(), [tags[0]])
@@ -83,4 +117,6 @@ if __name__ == '__main__':
     plot_wrapper_nowrapper_comparsion(os.getcwd(), [tags[0]])
     plot_wrapper_nowrapper_comparsion(os.getcwd(), [tags[1]])
     
+    plot_sac_compare(os.getcwd())
+    plot_ppo_compare(os.getcwd())
     go_throght_dir(os.getcwd())

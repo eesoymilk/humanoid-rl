@@ -30,7 +30,7 @@ def parse_args() -> tuple[str, int, bool]:
         dest="model_name",
         type=str,
         required=True,
-        help="The name of the model to evaluate.",
+        help="The name of the model to evaluate. E.g. SAC_nowrapped.",
     )
     parser.add_argument(
         "--e",
@@ -101,17 +101,17 @@ def main() -> None:
         no_wrapper=not use_wrapper, render_mode="human" if render else None
     )
 
-    chkpt = str(SCRIPT_DIR / "models" / model_name)
+    chkpt = str(SCRIPT_DIR / "final_models" / model_name)
 
-    if algo_name == "sac":
+    if algo_name == "SAC":
         model = SAC.load(chkpt)
-    elif algo_name == "td3":
+    elif algo_name == "TD3":
         model = TD3.load(chkpt)
-    elif algo_name == "ppo":
+    elif algo_name == "PPO":
         model = PPO.load(chkpt)
-    elif algo_name == "a2c":
+    elif algo_name == "A2C":
         model = A2C.load(chkpt)
-    elif algo_name == "ddpg":
+    elif algo_name == "DDPG":
         model = DDPG.load(chkpt)
     else:
         raise ValueError(f"Invalid algorithm: {algo_name}")
