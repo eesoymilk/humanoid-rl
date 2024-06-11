@@ -3,6 +3,8 @@
 > This is the final project for the course "Deep Reinforcement Learning" at the National Tsing Hua University.
 > The goal of this project is to train an agent to solve [the MuJuCo Humanoid environment](https://gymnasium.farama.org/main/environments/mujoco/humanoid/).
 
+![The image of result in render mode](./Walk-Away.png)
+
 ## Environment Installation
 
 ### Create a Conda Environment
