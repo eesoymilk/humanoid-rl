@@ -45,12 +45,21 @@ def parse_args() -> tuple[int, int, bool, str]:
         default=False,
         help="Disable the custom observation wrapper.",
     )
+    parser.add_argument(
+        "-rb",
+        "--replay-buffer",
+        type=int,
+        dest="replay_buffer",
+        default=1_000_000,
+        help="The size of the replay buffer. [Default: 1_000_000]",
+    )
     args = parser.parse_args()
 
     return (
         args.timesteps,
         args.no_wrapper,
         args.algo,
+        args.replay_buffer,
     )
 
 
@@ -62,6 +71,7 @@ def train(
     no_wrapper: bool,
     log_interval: int = 10,
     progress_bar: bool = True,
+    replay_buffer: int = 1_000_000,
 ) -> None:
     run_name = f"{model.__class__.__name__}_{'no' if no_wrapper else ''}wrapped_{start_time_str}"
     try:
@@ -79,7 +89,7 @@ def train(
 
 
 def main() -> None:
-    total_timesteps, no_wrapper, algo = parse_args()
+    total_timesteps, no_wrapper, algo, replay_buffer = parse_args()
 
     start_time_str = datetime.now().strftime("%m%d%H%M")
 
@@ -95,7 +105,7 @@ def main() -> None:
 
     env = get_humanoid_env(no_wrapper=no_wrapper)
 
-    model = load_model(env, algo, tensorboard_log=tb_log)
+    model = load_model(env, algo, replay_buffer, tensorboard_log=tb_log)
     train(model, start_time_str, total_timesteps, chkpt_dir, no_wrapper)
 
 

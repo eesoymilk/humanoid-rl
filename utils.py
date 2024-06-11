@@ -25,11 +25,13 @@ def get_humanoid_env(
 def load_model(
     env: gym.Env,
     algo: Literal["sac", "td3", "ppo", "a2c", "ddpg"],
+    replay_buffer: int,
     tensorboard_log: Optional[str] = None,
     chkpt: Optional[str] = None,
 ) -> SAC | PPO | TD3 | A2C | DDPG:
     args = ("MlpPolicy", env)
     kwargs = {"verbose": 1, "tensorboard_log": tensorboard_log}
+    
 
     if algo in ["td3", "ddpg"]:
         n_actions = env.action_space.shape[-1]
@@ -39,7 +41,7 @@ def load_model(
     print("Algorithm: ", end="")
     if algo == "sac":
         print("SAC")
-        model = SAC(*args, **kwargs)
+        model = SAC(*args, **kwargs, buffer_size=replay_buffer)
     elif algo == "td3":
         print("TD3")
         model = TD3(*args, **kwargs)
