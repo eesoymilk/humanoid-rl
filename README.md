@@ -3,7 +3,7 @@
 > This is the final project for the course "Deep Reinforcement Learning" at the National Tsing Hua University.
 > The goal of this project is to train an agent to solve [the MuJuCo Humanoid environment](https://gymnasium.farama.org/main/environments/mujoco/humanoid/).
 
-## Installation
+## Environment Installation
 
 ### Create a Conda Environment
 
@@ -26,6 +26,7 @@ In `$CONDA_PATH/envs/humanoidrun -n libpython3.11/site-packages/gymnasium/envs/m
 To fix this bug, you need to replace the following code in line 592:
 
 - Before:
+
     ```python
             self.add_overlay(
                 bottomleft, "Solver iterations", str(self.data.solver_iter + 1)
@@ -33,6 +34,7 @@ To fix this bug, you need to replace the following code in line 592:
     ```
 
 - After:
+
     ```python
             self.add_overlay(
                 bottomleft, "Solver iterations", str(self.data.solver_niter + 1)
@@ -46,7 +48,7 @@ After this fix, the rendering of the MuJuCo environment should work properly.
 ### Training
 
 ```bash
-conda run -n humanoid python3 train.py <options...>
+conda activate humanoid && python3 train.py <options...>
 ```
 
 #### Options
@@ -56,7 +58,7 @@ conda run -n humanoid python3 train.py <options...>
     Show help message and exit
 
 - `-t`, `--timesteps`: `[int]`
-                    
+
     The total number of timesteps to train for. (Default: `5_000_000`)
 
 - `--no-wrapper`
@@ -70,7 +72,7 @@ conda run -n humanoid python3 train.py <options...>
 ### Evaluating
 
 ```bash
-conda run -n humanoid python3 eval.py <options...>
+conda activate humanoid && python3 eval.py <options...>
 ```
 
 #### Options
@@ -82,22 +84,20 @@ conda run -n humanoid python3 eval.py <options...>
 - (**required**) `-m`, `--model`, `--model-name`: `[str]`
 
     The name of the model to evaluate.
+    This repo offer basic pre-trained model
+    |Model Name|Parameter|
+    |---|---|
+    |SAC|`sac_wrapped`|
+    |SAC without wrapped|`sac_nowrapped`|
+    |PPO|`PPO_wrapped`|
+    |PPO without wrapped|`PPO_nowrapped`|
+    |A2C|`A2C_wrapped`|
+    |A2C without wrapped|`A2C_nowrapped`|
+    |TD3|`TD3_wrapped`|
+    |TD3 without wrapped|`TD3_nowrapped`|
+    |DDPG|`DDPG_wrapped`|
+    |DDPG without wrapped|`DDPG_nowrapped`|
 
 - `-r`, `--render`
 
      Render the environment. (Default: `False`)
-
-## Finished
-
-```bash
-conda activate humanoid && python3 train.py -a sac
-conda activate humanoid && python3 train.py -a sac --no-wrapper
-conda activate humanoid && python3 train.py -a td3
-conda activate humanoid && python3 train.py -a td3 --no-wrapper
-conda activate humanoid && python3 train.py -a ppo
-conda activate humanoid && python3 train.py -a ppo --no-wrapper
-conda activate humanoid && python3 train.py -a a2c
-conda activate humanoid && python3 train.py -a a2c --no-wrapper
-conda activate humanoid && python3 train.py -a ddpg
-conda activate humanoid && python3 train.py -a ddpg --no-wrapper
-```
