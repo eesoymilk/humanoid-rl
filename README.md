@@ -64,6 +64,14 @@ conda activate humanoid && python3 train.py <options...>
 
     The algorithm to use for training. (Default: `sac`)
 
+- `-rb`, `--replay-buffer`
+
+    Adjuest the replay buffer size. (Defalut: `1000000`)
+
+- `-si`, `--save-interval`
+
+    The timesteps between two model save time. (Default: `1000000`)
+
 ## Evaluation
 
 ```eval

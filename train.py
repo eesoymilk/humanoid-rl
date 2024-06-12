@@ -1,8 +1,10 @@
 import sys
+import os
 import argparse
 from pathlib import Path
 from datetime import datetime
 from stable_baselines3 import SAC, PPO, TD3, A2C, DDPG
+from stable_baselines3.common.callbacks import BaseCallback
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.append(str(SCRIPT_DIR))
@@ -53,6 +55,13 @@ def parse_args() -> tuple[int, int, bool, str]:
         default=1_000_000,
         help="The size of the replay buffer. [Default: 1_000_000]",
     )
+    parser.add_argument(
+        "-si",
+        "--save-interval",
+        type=int,
+        default=1_000_000,
+        help="The number of timesteps between saving the model. [Default: 1_000_000]",
+    )
     args = parser.parse_args()
 
     return (
@@ -60,8 +69,26 @@ def parse_args() -> tuple[int, int, bool, str]:
         args.no_wrapper,
         args.algo,
         args.replay_buffer,
+        args.save_interval,
     )
 
+class SaveOnBestTrainingRewardCallback(BaseCallback):
+    """
+    Callback for saving a model every 'save_interval' steps
+    """
+    def __init__(self, save_interval: int, save_path: str, verbose=1):
+        super().__init__(verbose)
+        self.save_interval = save_interval
+        self.save_path = save_path
+        self.best_mean_reward = -float('inf')
+
+    def _on_step(self) -> bool:
+        if self.n_calls != 0 and self.n_calls % self.save_interval == 0:
+            path = os.path.join(self.save_path, f'model_{self.num_timesteps}.zip')
+            self.model.save(path)
+            if self.verbose > 0:
+                print(f"Saving model checkpoint to {path} on step {self.num_timesteps}")
+        return True
 
 def train(
     model: SAC | PPO | TD3 | A2C | DDPG,
@@ -71,15 +98,18 @@ def train(
     no_wrapper: bool,
     log_interval: int = 10,
     progress_bar: bool = True,
-    replay_buffer: int = 1_000_000,
+    save_interval: int = 1_000_000,
 ) -> None:
     run_name = f"{model.__class__.__name__}_{'no' if no_wrapper else ''}wrapped_{start_time_str}"
+    save_path = str(chkpt_dir / run_name)
+    callback = SaveOnBestTrainingRewardCallback(save_interval, save_path)
     try:
         model.learn(
             total_timesteps=total_timesteps,
             log_interval=log_interval,
             tb_log_name=run_name,
             progress_bar=progress_bar,
+            callback=callback
         )
     except KeyboardInterrupt:
         now = datetime.now()
@@ -89,7 +119,7 @@ def train(
 
 
 def main() -> None:
-    total_timesteps, no_wrapper, algo, replay_buffer = parse_args()
+    total_timesteps, no_wrapper, algo, replay_buffer, save_interval = parse_args()
 
     start_time_str = datetime.now().strftime("%m%d%H%M")
 
@@ -106,7 +136,7 @@ def main() -> None:
     env = get_humanoid_env(no_wrapper=no_wrapper)
 
     model = load_model(env, algo, replay_buffer, tensorboard_log=tb_log)
-    train(model, start_time_str, total_timesteps, chkpt_dir, no_wrapper)
+    train(model, start_time_str, total_timesteps, chkpt_dir, no_wrapper, save_interval)
 
 
 if __name__ == "__main__":
