@@ -12,15 +12,16 @@ sys.path.append(str(SCRIPT_DIR))
 from utils import get_humanoid_env, load_model
 
 
-def parse_args() -> tuple[int, int, bool, str]:
+def parse_args() -> tuple[int, str, bool, int, int]:
     """
     Parse the command line arguments.
 
     return:
         total_timesteps: int
-        n_envs: int
-        no_wrapper: bool
         algo: str
+        no_wrapper: bool
+        replay_buffer: int
+        save_interval: int
     """
     parser = argparse.ArgumentParser(
         "train", description="Train the Humanoid environment."
@@ -72,10 +73,12 @@ def parse_args() -> tuple[int, int, bool, str]:
         args.save_interval,
     )
 
+
 class SaveOnBestTrainingRewardCallback(BaseCallback):
     """
     Callback for saving a model every 'save_interval' steps
     """
+
     def __init__(self, save_interval: int, save_path: str, verbose=1):
         super().__init__(verbose)
         self.save_interval = save_interval
@@ -84,11 +87,16 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
 
     def _on_step(self) -> bool:
         if self.n_calls != 0 and self.n_calls % self.save_interval == 0:
-            path = os.path.join(self.save_path, f'model_{self.num_timesteps}.zip')
+            path = os.path.join(
+                self.save_path, f'model_{self.num_timesteps}.zip'
+            )
             self.model.save(path)
             if self.verbose > 0:
-                print(f"Saving model checkpoint to {path} on step {self.num_timesteps}")
+                print(
+                    f"Saving model checkpoint to {path} on step {self.num_timesteps}"
+                )
         return True
+
 
 def train(
     model: SAC | PPO | TD3 | A2C | DDPG,
@@ -109,7 +117,7 @@ def train(
             log_interval=log_interval,
             tb_log_name=run_name,
             progress_bar=progress_bar,
-            callback=callback
+            callback=callback,
         )
     except KeyboardInterrupt:
         now = datetime.now()
@@ -119,7 +127,9 @@ def train(
 
 
 def main() -> None:
-    total_timesteps, no_wrapper, algo, replay_buffer, save_interval = parse_args()
+    total_timesteps, no_wrapper, algo, replay_buffer, save_interval = (
+        parse_args()
+    )
 
     start_time_str = datetime.now().strftime("%m%d%H%M")
 
@@ -136,7 +146,14 @@ def main() -> None:
     env = get_humanoid_env(no_wrapper=no_wrapper)
 
     model = load_model(env, algo, replay_buffer, tensorboard_log=tb_log)
-    train(model, start_time_str, total_timesteps, chkpt_dir, no_wrapper, save_interval)
+    train(
+        model,
+        start_time_str,
+        total_timesteps,
+        chkpt_dir,
+        no_wrapper,
+        save_interval,
+    )
 
 
 if __name__ == "__main__":

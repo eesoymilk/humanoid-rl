@@ -31,7 +31,6 @@ def load_model(
 ) -> SAC | PPO | TD3 | A2C | DDPG:
     args = ("MlpPolicy", env)
     kwargs = {"verbose": 1, "tensorboard_log": tensorboard_log}
-    
 
     if algo in ["td3", "ddpg"]:
         n_actions = env.action_space.shape[-1]
