@@ -40,7 +40,7 @@ def load_model(
     print("Algorithm: ", end="")
     if algo == "sac":
         print("SAC")
-        model = SAC(*args, **kwargs, buffer_size=replay_buffer)
+        model = SAC(buffer_size=replay_buffer, *args, **kwargs)
     elif algo == "td3":
         print("TD3")
         model = TD3(*args, **kwargs)
