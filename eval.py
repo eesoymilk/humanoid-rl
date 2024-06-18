@@ -24,6 +24,15 @@ def parse_args() -> tuple[str, int, bool]:
         "eval", description="Evaluate the Humanoid environment."
     )
     parser.add_argument(
+        "-a",
+        "--algo",
+        "--algorithm",
+        dest="algo",
+        type=str,
+        default="sac",
+        help="The algorithm to use for evaluation. [Default: sac]",
+    )
+    parser.add_argument(
         "-m",
         "--model",
         "--model-name",
@@ -50,7 +59,7 @@ def parse_args() -> tuple[str, int, bool]:
     )
     args = parser.parse_args()
 
-    return args.model_name, args.n_episodes, args.render
+    return args.algo, args.model_name, args.n_episodes, args.render
 
 
 def eval(
@@ -88,9 +97,7 @@ def eval(
 
 
 def main() -> None:
-    model_name, n_episodes, render = parse_args()
-    parts = model_name.split("_")
-    algo_name = parts[0]
+    algo_name, model_name, n_episodes, render = parse_args()
     use_wrapper = "wrapped" in model_name.split("_")
 
     print(
